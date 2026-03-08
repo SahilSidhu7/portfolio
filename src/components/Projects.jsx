@@ -28,7 +28,7 @@ const PROJECTS = [
     description: 'learn-flow-coder is a developer learning project focused on improving programming skills through structured coding workflows, practice problems, and implementation of core computer science concepts. The repository serves as a personal learning environment for experimenting with algorithms, programming patterns, and practical coding exercises.',
     tech: ['Typescript', 'supabase'],
     githubUrl: 'https://github.com/SahilSidhu7/learn-flow-coder.git',
-    image: '',
+    image: 'https://github.com/SahilSidhu7/learn-flow-coder/blob/main/screenshots/mainpage.png?raw=true',
   },
 ]
 

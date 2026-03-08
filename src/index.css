@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+/* Dark purple theme */
+@theme {
+  --color-surface: #1a1625;
+  --color-surface-alt: #251f33;
+  --color-surface-elevated: #2d2640;
+  --color-muted: #9b8fb8;
+  --color-accent: #8b5cf6;
+  --color-accent-hover: #a78bfa;
+  --color-accent-muted: #6d28d9;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, #281647 0, transparent 55%),
+    radial-gradient(circle at top right, #291241 0, transparent 55%),
+    radial-gradient(circle at bottom, #120a26 0, transparent 60%),
+    var(--color-surface);
+}
+body {
+  background: transparent;
+  color: #e9e4f0;
+}
+
+/* Centered content with side margins */
+.container {
+  width: 100%;
+  max-width: 72rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+@media (min-width: 768px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}

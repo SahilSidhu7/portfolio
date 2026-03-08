@@ -91,7 +91,7 @@ function About() {
                 </a>
               </li>
               <li>
-                <a href='https://github.com/SahilSidhu7/Me/blob/32d1b090b15ae19290742cb5db51109eca62d4c9/SahilpreetSinghSidhu.pdf'>
+                <a href='https://github.com/SahilSidhu7/Me/blob/main/SahilSidhu.pdf'>
                 <button
                   type="button"
                   className="mt-1 inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-white text-xs font-medium transition-colors"

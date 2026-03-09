@@ -3,6 +3,13 @@ import React, { useState } from 'react'
 // Add your projects here. Use image paths from public folder (e.g. /projects/thumb.png) or import from assets.
 const PROJECTS = [
   {
+    title: 'AI Chatbot Pop-Up',
+    description: 'An AI-powered chatbot that answers questions about a website by scraping its content and using Retrieval Augmented Generation (RAG). The chatbot can be embedded into any website as a floating chat widget.',
+    tech: ['Python', 'FastAPI', 'React', 'Ollama', 'FAISS', 'BeautifulSoup', 'Requests', 'AI/RAG'],
+    githubUrl: 'https://github.com/SahilSidhu7/ai-website-chatbot',
+    image: 'https://github.com/SahilSidhu7/ai-website-chatbot/blob/main/screenshots/chatthinking.png?raw=true', // replace with your image: e.g. '/projects/project1.png' or import
+  },
+  {
     title: 'AI Lead Generator',
     description: 'Built an AI-powered lead generation system using Python, FastAPI, React, and Ollama (Phi-3). The system scrapes websites, analyzes businesses using AI, and generates personalized outreach emails.',
     tech: ['Python', 'FastAPI', 'React', 'Ollama'],
@@ -42,7 +49,7 @@ function ProjectCard({ project, index }) {
       } hover:border-white/20 hover:shadow-[0_0_0_1px_rgba(139,92,246,0.25),0_0_48px_rgba(139,92,246,0.25)]`}
     >
       {/* Image side — square, smaller */}
-      <div className="relative w-full md:w-75 overflow-hidden">
+      <div className="relative w-full md:w-75 md:h-70 overflow-hidden">
         <img
           src={project.image}
           alt={project.title}

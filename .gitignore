@@ -27,3 +27,4 @@ dist-ssr
 chatbot/__pycache__
 chatbot/vectorstore
 chatbot/.env
+chatbot/static/chatbotold2.js

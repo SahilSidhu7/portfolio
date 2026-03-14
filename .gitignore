@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+chatbot/__pycache__
+chatbot/vectorstore
+chatbot/.env

@@ -11,7 +11,7 @@
     document.body.appendChild(container);
 
     const script = document.createElement("script");
-    script.src = "http://localhost:8000/static/chatbot.js";
+    script.src = "https://pchat.webappster.store/static/chatbot.js";
 
     document.body.appendChild(script);
 

@@ -9,3 +9,4 @@ pydantic
 selenium
 python-dotenv
 langchain-core
+google-generativeai

@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import requests
 import os
 from dotenv import load_dotenv
+import google.generativeai as genai
 
 from fastapi.staticfiles import StaticFiles
 
@@ -14,6 +15,10 @@ load_dotenv()
 
 OLLAMA_URL = os.getenv("ollama_url")
 MODEL = os.getenv("model")
+GEMINI_API_KEY = os.getenv("gemini_api_key")
+
+if GEMINI_API_KEY:
+    genai.configure(api_key=GEMINI_API_KEY)
 
 app = FastAPI()
 
@@ -38,6 +43,47 @@ embeddings = OllamaEmbeddings(model=MODEL, base_url=OLLAMA_URL)
 db = FAISS.load_local("vectorstore", embeddings, allow_dangerous_deserialization=True)
 
 
+def get_llm_response(prompt: str) -> str:
+    """Try Gemini API first, fall back to Ollama if it fails."""
+    
+    # Try Gemini 2.0 Flash first
+    if GEMINI_API_KEY:
+        try:
+            model = genai.GenerativeModel("gemini-2.0-flash")
+            response = model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    max_output_tokens=250,
+                    temperature=0.2,
+                    top_p=0.9,
+                )
+            )
+            if response and response.text:
+                return response.text
+        except Exception as e:
+            print(f"Gemini API error: {e}")
+    
+    # Fall back to Ollama
+    try:
+        payload = {
+            "model": MODEL,
+            "prompt": prompt,
+            "stream": False,
+            "options": {
+                "num_predict": 250,
+                "temperature": 0.2,
+                "top_p": 0.9
+            }
+        }
+        r = requests.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=30)
+        r.raise_for_status()
+        answer = r.json().get("response", "")
+        return answer
+    except Exception as e:
+        print(f"Ollama fallback error: {e}")
+        return "The assistant is currently unavailable."
+
+
 @app.post("/chat")
 def chat(req: ChatRequest):
 
@@ -52,44 +98,24 @@ def chat(req: ChatRequest):
         for d in docs
     )
 
-    prompt = f"""
-You are the official AI assistant for this website.
+    prompt = f"""You are a helpful assistant for this portfolio website. Answer visitor questions using ONLY the website information provided below.
 
-You answer questions for visitors using ONLY the website information below.
-
-Guidelines:
-- Speak as the website team (use "we", "our").
-- Be concise and helpful.
-- Format responses in clean markdown.
-- Use bullet points when possible.
-- Never mention AI models or context retrieval.
-- Add proper spacing even in between lines.
-
-If the information is not available in the website data, respond exactly:
-
-"I couldn't find that information on this website."
+Rules:
+- Answer in 2-4 sentences maximum for simple questions
+- Only use a bullet list if there are 3+ distinct items to show
+- Never use headers, bold text, or ### formatting
+- Never use filler phrases or sign-offs
+- Use "we" and "our" when referring to the team
+- If the answer is not in the website information, respond exactly: "I couldn't find that information on this website."
 
 Website information:
 {context}
 
-Visitor question:
-{question}
+Visitor question: {question}
 
-Answer:
-"""
+Answer (be brief and direct):"""
 
-    payload = {
-        "model": MODEL,
-        "prompt": prompt,
-        "stream": False
-    }
-
-    try:
-        r = requests.post(f"{OLLAMA_URL}/api/generate", json=payload)
-        r.raise_for_status()
-        answer = r.json().get("response", "")
-    except Exception as e:
-        answer = "The assistant is currently unavailable."
+    answer = get_llm_response(prompt)
 
     sources = list({d.metadata.get("source") for d in docs if d.metadata.get("source")})
 

@@ -7,7 +7,7 @@ Runs entirely on local small models — no API keys, no cloud LLM, privacy-first
 - **Retrieval**: hybrid — FAISS dense (embeddinggemma, 300M) + bm25s sparse, fused with reciprocal rank fusion
 - **Rerank**: FlashRank cross-encoder (ms-marco-MiniLM-L-12-v2, ~34MB ONNX, CPU)
 - **Confidence gate**: dual-evidence — answers only if rerank score >= `MIN_RERANK_SCORE` OR BM25 lexical overlap >= `MIN_BM25_SCORE`; otherwise a fixed "not on this site" refusal, no hallucinated answers
-- **Generation**: qwen3:1.7b via Ollama, streaming (`GEN_MODEL` env to swap models)
+- **Generation**: qwen3:1.7b via Ollama, streaming; `gemma3:1b` is the low-RAM swap (`GEN_MODEL` env)
 - **Widget**: dependency-free vanilla JS (~3KB), token-by-token streaming
 
 ## Setup

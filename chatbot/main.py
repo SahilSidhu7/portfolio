@@ -20,7 +20,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # public embeddable widget
-    allow_credentials=True,
+    allow_credentials=False,  # no cookies/auth on this API
     allow_methods=["*"],
     allow_headers=["*"],
 )

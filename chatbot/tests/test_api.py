@@ -10,6 +10,7 @@ CHUNK = {"id": 0, "text": "Pricing — u\n$99/month.", "source": "https://x.com/
 
 def wire(monkeypatch, ranked, deltas=("$99", "/month.")):
     monkeypatch.setattr(main, "_store", object())
+    monkeypatch.setattr(main.retrieval, "MIN_RERANK_SCORE", 0.3)  # decouple from developer .env
     monkeypatch.setattr(main.retrieval, "search", lambda store, q, **k: [CHUNK])
     monkeypatch.setattr(main.retrieval, "rerank", lambda q, chunks, **k: ranked)
     monkeypatch.setattr(main.retrieval, "bm25_top", lambda s, q: 0.0)

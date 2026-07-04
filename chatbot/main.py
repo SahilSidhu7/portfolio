@@ -53,7 +53,10 @@ def retrieve(question: str):
 
 @app.post("/chat")
 def chat(req: ChatRequest):
-    chunks, sources = retrieve(req.question)
+    try:
+        chunks, sources = retrieve(req.question)
+    except Exception:
+        return {"answer": generation.UNAVAILABLE, "sources": []}
     if chunks is None:
         return {"answer": generation.REFUSAL, "sources": []}
     try:
@@ -65,7 +68,14 @@ def chat(req: ChatRequest):
 
 @app.post("/chat/stream")
 def chat_stream(req: ChatRequest):
-    chunks, sources = retrieve(req.question)
+    try:
+        chunks, sources = retrieve(req.question)
+    except Exception:
+        def sse_unavailable():
+            yield f"data: {json.dumps({'delta': generation.UNAVAILABLE})}\n\n"
+            yield f"data: {json.dumps({'done': True, 'sources': []})}\n\n"
+
+        return StreamingResponse(sse_unavailable(), media_type="text/event-stream")
 
     def sse():
         if chunks is None:

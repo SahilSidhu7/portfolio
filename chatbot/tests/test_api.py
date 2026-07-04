@@ -1,7 +1,7 @@
 import json
 import main
 from fastapi.testclient import TestClient
-from generation import REFUSAL
+from generation import REFUSAL, UNAVAILABLE
 
 client = TestClient(main.app)
 
@@ -48,4 +48,49 @@ def test_stream_gated(monkeypatch):
     with client.stream("POST", "/chat/stream", json={"question": "?"}) as resp:
         events = [json.loads(l[6:]) for l in resp.iter_lines() if l.startswith("data: ")]
     assert events[0] == {"delta": REFUSAL}
+    assert events[-1] == {"done": True, "sources": []}
+
+
+def test_chat_generation_unavailable(monkeypatch):
+    wire(monkeypatch, ranked=[(CHUNK, 0.9)])
+    monkeypatch.setattr(main.generation, "answer",
+                        lambda *a, **k: (_ for _ in ()).throw(RuntimeError("ollama down")))
+    resp = client.post("/chat", json={"question": "price?"})
+    assert resp.json() == {"answer": UNAVAILABLE, "sources": []}
+
+
+def test_stream_generation_unavailable(monkeypatch):
+    wire(monkeypatch, ranked=[(CHUNK, 0.9)])
+
+    def raise_stream(*a, **k):
+        raise RuntimeError("ollama down")
+
+    monkeypatch.setattr(main.generation, "stream_answer", raise_stream)
+    with client.stream("POST", "/chat/stream", json={"question": "price?"}) as resp:
+        events = [json.loads(l[6:]) for l in resp.iter_lines() if l.startswith("data: ")]
+    assert events[0] == {"delta": UNAVAILABLE}
+    assert events[-1] == {"done": True, "sources": ["https://x.com/pricing"]}
+
+
+def test_chat_retrieval_unavailable(monkeypatch):
+    wire(monkeypatch, ranked=[(CHUNK, 0.9)])
+
+    def raise_search(*a, **k):
+        raise RuntimeError("ollama down")
+
+    monkeypatch.setattr(main.retrieval, "search", raise_search)
+    resp = client.post("/chat", json={"question": "price?"})
+    assert resp.json() == {"answer": UNAVAILABLE, "sources": []}
+
+
+def test_stream_retrieval_unavailable(monkeypatch):
+    wire(monkeypatch, ranked=[(CHUNK, 0.9)])
+
+    def raise_search(*a, **k):
+        raise RuntimeError("ollama down")
+
+    monkeypatch.setattr(main.retrieval, "search", raise_search)
+    with client.stream("POST", "/chat/stream", json={"question": "price?"}) as resp:
+        events = [json.loads(l[6:]) for l in resp.iter_lines() if l.startswith("data: ")]
+    assert events[0] == {"delta": UNAVAILABLE}
     assert events[-1] == {"done": True, "sources": []}

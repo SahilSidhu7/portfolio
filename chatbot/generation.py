@@ -35,6 +35,7 @@ def stream_answer(prompt: str, model: str | None = None, url: str | None = None)
         "prompt": prompt,
         "stream": True,
         "think": False,
+        "keep_alive": "30m",  # sporadic widget traffic; avoid cold model loads
         "options": {"num_predict": 300, "temperature": 0.2, "top_p": 0.9},
     }
     with requests.post(f"{url or OLLAMA_URL}/api/generate", json=payload, stream=True, timeout=120) as r:

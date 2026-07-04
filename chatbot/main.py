@@ -44,7 +44,9 @@ def retrieve(question: str):
     store = get_store()
     candidates = retrieval.search(store, question)
     ranked = retrieval.rerank(question, candidates)
-    if not retrieval.passes_gate(ranked):
+    confident = retrieval.passes_gate(ranked)
+    lexical = retrieval.bm25_top(store, question) >= retrieval.MIN_BM25_SCORE
+    if not (confident or lexical):
         return None, []
     chunks = [c for c, _ in ranked]
     sources = list(dict.fromkeys(c["source"] for c in chunks))

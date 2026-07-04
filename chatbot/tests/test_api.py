@@ -12,6 +12,7 @@ def wire(monkeypatch, ranked, deltas=("$99", "/month.")):
     monkeypatch.setattr(main, "_store", object())
     monkeypatch.setattr(main.retrieval, "search", lambda store, q, **k: [CHUNK])
     monkeypatch.setattr(main.retrieval, "rerank", lambda q, chunks, **k: ranked)
+    monkeypatch.setattr(main.retrieval, "bm25_top", lambda s, q: 0.0)
     monkeypatch.setattr(main.generation, "answer", lambda prompt, **k: "".join(deltas))
     monkeypatch.setattr(main.generation, "stream_answer", lambda prompt, **k: iter(deltas))
 
@@ -26,9 +27,23 @@ def test_chat_answers_with_sources(monkeypatch):
 
 
 def test_chat_gated_returns_refusal_without_llm(monkeypatch):
-    wire(monkeypatch, ranked=[(CHUNK, 0.01)])
+    wire(monkeypatch, ranked=[(CHUNK, 0.001)])
     monkeypatch.setattr(main.generation, "answer",
                         lambda *a, **k: (_ for _ in ()).throw(AssertionError("LLM called")))
+    resp = client.post("/chat", json={"question": "moon landing?"})
+    assert resp.json() == {"answer": REFUSAL, "sources": []}
+
+
+def test_chat_bm25_fallback_passes_gate_when_rerank_low(monkeypatch):
+    wire(monkeypatch, ranked=[(CHUNK, 0.0001)])
+    monkeypatch.setattr(main.retrieval, "bm25_top", lambda s, q: 5.0)
+    resp = client.post("/chat", json={"question": "price?"})
+    assert resp.json() == {"answer": "$99/month.", "sources": ["https://x.com/pricing"]}
+
+
+def test_chat_gated_when_rerank_and_bm25_both_low(monkeypatch):
+    wire(monkeypatch, ranked=[(CHUNK, 0.0001)])
+    monkeypatch.setattr(main.retrieval, "bm25_top", lambda s, q: 0.0)
     resp = client.post("/chat", json={"question": "moon landing?"})
     assert resp.json() == {"answer": REFUSAL, "sources": []}
 

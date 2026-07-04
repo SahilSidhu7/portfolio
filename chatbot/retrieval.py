@@ -85,6 +85,15 @@ def search(store: Store, question: str, k: int = 20, embed=embed_texts) -> list[
 
 
 MIN_RERANK_SCORE = float(os.getenv("MIN_RERANK_SCORE", "0.3"))
+MIN_BM25_SCORE = float(os.getenv("MIN_BM25_SCORE", "1.0"))
+
+
+def bm25_top(store: Store, question: str) -> float:
+    """Best sparse score — lexical evidence that the question is about this site."""
+    qtokens = bm25s.tokenize([question], stopwords="en")
+    ids, scores = store.bm25.retrieve(qtokens, k=min(1, len(store.chunks)))
+    return float(scores[0][0]) if len(ids[0]) else 0.0
+
 
 _ranker = None
 

@@ -1,18 +1,6 @@
+// chatbot/static/embed.js
 (function () {
-
-    const container = document.createElement("div");
-    container.id = "ai-chatbot-widget";
-
-    container.style.position = "fixed";
-    container.style.bottom = "20px";
-    container.style.right = "20px";
-    container.style.zIndex = "9999";
-
-    document.body.appendChild(container);
-
-    const script = document.createElement("script");
-    script.src = "https://pchat.webappster.store/static/chatbot.js?v=99";
-
-    document.body.appendChild(script);
-
+  const script = document.createElement("script");
+  script.src = "https://pchat.webappster.store/static/widget.js?v=1";
+  document.body.appendChild(script);
 })();

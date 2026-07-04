@@ -82,3 +82,39 @@ def search(store: Store, question: str, k: int = 20, embed=embed_texts) -> list[
 
     fused = rrf([dense_ranking, sparse_ranking])[:k]
     return [store.chunks[cid] for cid in fused]
+
+
+MIN_RERANK_SCORE = float(os.getenv("MIN_RERANK_SCORE", "0.3"))
+
+_ranker = None
+
+
+def _default_ranker():
+    """Lazy-load flashrank so tests never download the ONNX model."""
+    global _ranker
+    if _ranker is None:
+        from flashrank import Ranker
+        _ranker = Ranker(model_name="ms-marco-MiniLM-L-12-v2", cache_dir="models")
+    return _ranker
+
+
+def rerank(question: str, chunks: list[dict], top_n: int = 4, ranker=None) -> list[tuple[dict, float]]:
+    if not chunks:
+        return []
+    ranker = ranker or _default_ranker()
+    from flashrank import RerankRequest
+    request = RerankRequest(
+        query=question,
+        passages=[{"id": c["id"], "text": c["text"]} for c in chunks],
+    )
+    results = ranker.rerank(request)
+    by_id = {c["id"]: c for c in chunks}
+    ranked = sorted(results, key=lambda r: r["score"], reverse=True)[:top_n]
+    return [(by_id[r["id"]], float(r["score"])) for r in ranked]
+
+
+def passes_gate(ranked: list[tuple[dict, float]], threshold: float | None = None) -> bool:
+    if not ranked:
+        return False
+    limit = MIN_RERANK_SCORE if threshold is None else threshold
+    return ranked[0][1] >= limit

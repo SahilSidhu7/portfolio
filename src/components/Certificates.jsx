@@ -1,195 +1,170 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import certAi900 from '../assets/certificates/Cert113114552927-page-00001.jpg'
+import certDp900 from '../assets/certificates/Cert570114553972-page-00001.jpg'
+import certAz900 from '../assets/certificates/Cert958114555144-page-00001.jpg'
+import certFullstack from '../assets/certificates/certificate-fullstack.png'
+import certTypescript from '../assets/certificates/certificate-typescript.png'
+import certGraphql from '../assets/certificates/certificate-graphql.png'
+import certReactNative from '../assets/certificates/certificate-reactnative.png'
+import certCicd from '../assets/certificates/certificate-cicd.png'
 
-// Load all certificate images from assets/certificates (PNG and JPG for display)
-const certModules = import.meta.glob('../assets/certificates/*.{png,jpg,jpeg}', { eager: true })
-const CERTIFICATES = Object.entries(certModules)
-  .map(([path, mod]) => ({
-    src: mod.default,
-    title: path
-      .split(/[/\\]/)
-      .pop()
-      .replace(/\.(png|jpe?g)$/i, '')
-      .replace(/^certificate-/, '')
-      .replace(/-/g, ' '),
-  }))
-  .sort((a, b) => a.title.localeCompare(b.title))
+const SCORED = [
+  {
+    id: 'AZ-900',
+    name: 'Azure Fundamentals',
+    issuer: 'Microsoft Certified',
+    result: '957',
+    resultDetail: '/1000',
+    date: 'Aug 2025',
+    image: certAz900,
+  },
+  {
+    id: 'AI-900',
+    name: 'Azure AI Fundamentals',
+    issuer: 'Microsoft Certified',
+    result: '863',
+    resultDetail: '/1000',
+    date: 'Nov 2024',
+    image: certAi900,
+  },
+  {
+    id: 'DP-900',
+    name: 'Azure Data Fundamentals',
+    issuer: 'Microsoft Certified',
+    result: '790',
+    resultDetail: '/1000',
+    date: 'Aug 2025',
+    image: certDp900,
+  },
+  {
+    id: 'FSO',
+    name: 'Full Stack Open',
+    issuer: 'University of Helsinki',
+    result: '5/5',
+    resultDetail: ' · 7 ECTS',
+    date: '2025',
+    image: certFullstack,
+  },
+]
 
-function mod(n, m) {
-  return ((n % m) + m) % m
-}
+const FSO_PARTS = [
+  { name: 'TypeScript', image: certTypescript },
+  { name: 'GraphQL', image: certGraphql },
+  { name: 'React Native', image: certReactNative },
+  { name: 'CI/CD', image: certCicd },
+]
 
-export default function Certificates({ certificates, autoPlay = true }) {
-  const items = useMemo(
-    () => (certificates?.length ? certificates : CERTIFICATES),
-    [certificates]
-  )
-  const [active, setActive] = useState(0)
-  const [previewIndex, setPreviewIndex] = useState(null)
-  const reduceMotion = useRef(false)
+const COURSEWORK = [
+  'Generative AI for Everyone — DeepLearning.AI',
+  'AI For Everyone — DeepLearning.AI',
+  'Data Analytics Foundations',
+  'Cybersecurity for Everyone',
+  'AI and Disaster Management',
+]
+
+export default function Certificates() {
+  const [preview, setPreview] = useState(null)
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
-    reduceMotion.current =
-      window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches ?? false
-  }, [])
-
-  useEffect(() => {
-    if (!autoPlay || items.length <= 1 || reduceMotion.current) return
-    const id = window.setInterval(
-      () => setActive((a) => mod(a + 1, items.length)),
-      3200
-    )
-    return () => window.clearInterval(id)
-  }, [autoPlay, items.length])
-
-  const prev = (e) => {
-    e?.preventDefault()
-    setActive((a) => mod(a - 1, items.length))
-  }
-  const next = (e) => {
-    e?.preventDefault()
-    setActive((a) => mod(a + 1, items.length))
-  }
-
-  // Fixed card width and gap so cards don't overlap; use pixels for predictable spacing
-  const cardWidthPx = 280
-  const cardGapPx = 32
-  const maxVisibleDistance = 2
-  const coverflowPos = (i) => {
-    if (items.length === 0)
-      return { visible: false, x: 0, scale: 1, z: 0, opacity: 1, blur: 0 }
-    const raw = i - active
-    const wrapped =
-      raw > items.length / 2
-        ? raw - items.length
-        : raw < -items.length / 2
-          ? raw + items.length
-          : raw
-    const d = Math.max(-maxVisibleDistance, Math.min(maxVisibleDistance, wrapped))
-    const ad = Math.abs(d)
-    const visible = ad <= maxVisibleDistance
-    const offsetPx = cardWidthPx + cardGapPx
-    const x = d * offsetPx
-    const scale = d === 0 ? 1.08 : ad === 1 ? 0.82 : 0.68
-    const z = d === 0 ? 30 : ad === 1 ? 20 : 10
-    const opacity = d === 0 ? 1 : ad === 1 ? 0.85 : 0.45
-    const blur = d === 0 ? 0 : ad === 1 ? 0 : 1.5
-    return { visible, x, scale, z, opacity, blur }
-  }
-
-  if (items.length === 0) {
-    return (
-      <section className="py-16 md:py-24">
-        <h2 className="text-3xl font-bold text-white mb-4">Certificates</h2>
-        <p className="text-muted">Add PNG images to src/assets/certificates to show them here.</p>
-      </section>
-    )
-  }
+    if (!preview) return
+    const onKey = (event) => {
+      if (event.key === 'Escape') setPreview(null)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [preview])
 
   return (
-    <section className="py-16 md:py-24">
-      <div className="flex items-end justify-between gap-4 mb-10">
-        <div>
-          <h2 className="text-3xl font-bold text-white">Certificates</h2>
-          <p className="text-muted mt-2">Credentials I’ve earned.</p>
-        </div>
-        <div className="hidden sm:flex gap-2">
+    <section id="credentials" className="py-16 md:py-24">
+      <p className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-signal">
+        Credentials
+      </p>
+      <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-snow">
+        Certified, with the scores to show
+      </h2>
+
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {SCORED.map((cert) => (
           <button
+            key={cert.id}
             type="button"
-            onClick={prev}
-            className="px-3 py-2 rounded-lg bg-surface-elevated border border-white/10 text-muted hover:text-white hover:border-white/20 transition-colors"
+            onClick={() => setPreview({ title: `${cert.issuer}: ${cert.name}`, image: cert.image })}
+            className="group cursor-pointer rounded-xl border border-line bg-panel p-6 text-left transition-colors hover:border-iris/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-iris"
           >
-            Prev
+            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-fog">
+              {cert.issuer}
+            </p>
+            <h3 className="mt-2 font-display text-lg font-bold leading-snug text-snow">
+              {cert.name}
+            </h3>
+            <p className="mt-4 font-mono text-3xl font-semibold text-signal">
+              {cert.result}
+              <span className="text-sm text-fog">{cert.resultDetail}</span>
+            </p>
+            <p className="mt-4 flex items-center justify-between font-mono text-xs text-fog">
+              <span>{cert.date}</span>
+              <span className="text-iris-soft transition-colors group-hover:text-snow">
+                View certificate →
+              </span>
+            </p>
           </button>
-          <button
-            type="button"
-            onClick={next}
-            className="px-3 py-2 rounded-lg bg-surface-elevated border border-white/10 text-muted hover:text-white hover:border-white/20 transition-colors"
-          >
-            Next
-          </button>
-        </div>
+        ))}
       </div>
 
-      <div className="relative w-full overflow-hidden">
-        <div
-          className="relative mx-auto min-h-55 sm:min-h-65 flex items-center justify-center"
-          style={{ width: cardWidthPx * 3 + cardGapPx * 2 }}
-        >
-          {items.map((item, i) => {
-            const p = coverflowPos(i)
-            if (!p.visible) return null
-
-            return (
+      <div className="mt-8 grid gap-4 md:grid-cols-2">
+        <div className="rounded-xl border border-line bg-panel p-6">
+          <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-fog">
+            Full Stack Open — completed parts
+          </h3>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {FSO_PARTS.map((part) => (
               <button
-                key={item.src + i}
+                key={part.name}
                 type="button"
-                onClick={() => setActive(i)}
-                className="absolute left-1/2 top-1/2 shrink-0 rounded-xl overflow-hidden border border-white/10 bg-surface-elevated shadow-xl transition-[transform,opacity,filter] duration-500 ease-out focus:outline-none focus:ring-2 focus:ring-accent"
-                style={{
-                  width: cardWidthPx,
-                  aspectRatio: '3/2',
-                  transform: `translate(-50%, -50%) translateX(${p.x}px) scale(${p.scale})`,
-                  opacity: p.opacity,
-                  filter: p.blur ? `blur(${p.blur}px)` : undefined,
-                  zIndex: p.z,
-                }}
+                onClick={() => setPreview({ title: `Full Stack Open: ${part.name}`, image: part.image })}
+                className="cursor-pointer rounded-md border border-line bg-panel-2 px-3 py-1.5 font-mono text-xs text-snow transition-colors hover:border-iris/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-iris"
               >
-                <img
-                  src={item.src}
-                  alt={item.title}
-                  className="w-full h-full object-contain"
-                />
-                <span className="sr-only">{item.title}</span>
+                {part.name} ↗
               </button>
-            )
-          })}
+            ))}
+          </div>
         </div>
-
-        <div className="mt-8 flex justify-center gap-2 flex-wrap">
-          {items.map((item, i) => (
-            <button
-              key={item.src + i}
-              type="button"
-              aria-label={`Certificate: ${item.title}`}
-              onClick={() => setActive(i)}
-              className={`h-2.5 rounded-full transition-all duration-300 ${
-                i === active ? 'w-10 bg-accent' : 'w-2.5 bg-white/20 hover:bg-white/30'
-              }`}
-            />
-          ))}
+        <div className="rounded-xl border border-line bg-panel p-6">
+          <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-fog">
+            Additional coursework
+          </h3>
+          <ul className="mt-4 space-y-1.5 text-sm text-fog">
+            {COURSEWORK.map((course) => (
+              <li key={course}>{course}</li>
+            ))}
+          </ul>
         </div>
       </div>
 
-      {items[active] && (
-        <div className="mt-6 flex justify-center">
-          <button
-            type="button"
-            onClick={() => setPreviewIndex(active)}
-            className="px-4 py-2 rounded-lg bg-surface-elevated border border-white/20 text-sm text-muted hover:text-white hover:border-white/40 hover:bg-surface-elevated/80 transition-colors"
-          >
-            See certificate
-          </button>
-        </div>
-      )}
-
-      {previewIndex !== null && items[previewIndex] && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 px-4">
-          <div className="relative w-full max-w-4xl">
-            <button
-              type="button"
-              onClick={() => setPreviewIndex(null)}
-              className="absolute -top-10 right-0 text-sm text-muted hover:text-white"
-            >
-              Close
-            </button>
-            <div className="rounded-xl overflow-hidden border border-white/20 bg-surface-elevated shadow-2xl max-h-[80vh] flex items-center justify-center">
-              <img
-                src={items[previewIndex].src}
-                alt={items[previewIndex].title}
-                className="w-full h-full object-contain"
-              />
+      {preview && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4"
+          onClick={() => setPreview(null)}
+          role="dialog"
+          aria-modal="true"
+          aria-label={preview.title}
+        >
+          <div className="w-full max-w-3xl" onClick={(event) => event.stopPropagation()}>
+            <div className="mb-3 flex items-center justify-between">
+              <p className="font-mono text-sm text-fog">{preview.title}</p>
+              <button
+                type="button"
+                onClick={() => setPreview(null)}
+                className="cursor-pointer text-sm text-fog transition-colors hover:text-snow"
+              >
+                Close (Esc)
+              </button>
             </div>
+            <img
+              src={preview.image}
+              alt={preview.title}
+              className="max-h-[80vh] w-full rounded-xl border border-line bg-panel object-contain"
+            />
           </div>
         </div>
       )}

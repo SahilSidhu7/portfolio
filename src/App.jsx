@@ -7,20 +7,17 @@ import Projects from './components/Projects'
 import About from './components/About'
 
 function App() {
-
   return (
-    <div className="min-h-screen flex flex-col">
-      <main className="flex-1 w-full max-w-6xl mx-auto px-6 md:px-8 box-border">
-        <Navbar />
+    <div className="min-h-screen">
+      <Navbar />
+      <main className="mx-auto w-full max-w-5xl px-6 md:px-8">
         <Hero />
         <AboutIntro />
+        <Projects />
         <Skills />
         <Certificates />
-        <Projects />
-      </main>
-      <div className="w-full max-w-6xl mx-auto px-6 md:px-8 box-border">
         <About />
-      </div>
+      </main>
     </div>
   )
 }

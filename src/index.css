@@ -1,40 +1,62 @@
 @import "tailwindcss";
 
-/* Dark purple theme */
+/*
+  Theme: "ink & signal"
+  Deep violet-ink surfaces, one cool accent (iris) for actions,
+  one warm accent (signal amber) reserved for proof — scores, verdicts, readouts.
+*/
 @theme {
-  --color-surface: #1a1625;
-  --color-surface-alt: #251f33;
-  --color-surface-elevated: #2d2640;
-  --color-muted: #9b8fb8;
-  --color-accent: #8b5cf6;
-  --color-accent-hover: #a78bfa;
-  --color-accent-muted: #6d28d9;
+  --color-ink: #0f0d14;
+  --color-panel: #171321;
+  --color-panel-2: #1e1930;
+  --color-line: #2a2438;
+  --color-fog: #a79ec0;
+  --color-snow: #f0edf7;
+  --color-iris: #8674f4;
+  --color-iris-soft: #a493ff;
+  --color-signal: #f5b453;
+
+  --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
+  --font-sans: "Instrument Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 html {
-  background:
-    radial-gradient(circle at top left, #281647 0, transparent 55%),
-    radial-gradient(circle at top right, #291241 0, transparent 55%),
-    radial-gradient(circle at bottom, #120a26 0, transparent 60%),
-    var(--color-surface);
-}
-body {
-  background: transparent;
-  color: #e9e4f0;
+  background: var(--color-ink);
 }
 
-/* Centered content with side margins */
-.container {
-  width: 100%;
-  max-width: 72rem;
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+body {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(134, 116, 244, 0.10), transparent 70%),
+    var(--color-ink);
+  color: var(--color-snow);
+  font-family: var(--font-sans);
 }
-@media (min-width: 768px) {
-  .container {
-    padding-left: 2rem;
-    padding-right: 2rem;
+
+::selection {
+  background: var(--color-iris);
+  color: var(--color-ink);
+}
+
+/* Page-load stagger — only when motion is welcome */
+@media (prefers-reduced-motion: no-preference) {
+  .rise {
+    animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+
+  .rise-1 { animation-delay: 0.07s; }
+  .rise-2 { animation-delay: 0.14s; }
+  .rise-3 { animation-delay: 0.21s; }
+  .rise-4 { animation-delay: 0.28s; }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 }

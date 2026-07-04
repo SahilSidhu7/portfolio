@@ -1,117 +1,101 @@
 import React, { useState } from 'react'
-import port from "../assets/portfolio.png"
+
+const LINKS = [
+  { id: 'projects', label: 'Projects' },
+  { id: 'skills', label: 'Skills' },
+  { id: 'credentials', label: 'Credentials' },
+  { id: 'contact', label: 'Contact' },
+]
 
 const scrollToSection = (id) => {
-  if (typeof document === 'undefined') return
-  const el = document.getElementById(id)
-  if (!el) return
-  el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-const Navbar = () => {
+export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
+  const go = (id) => {
+    scrollToSection(id)
+    setIsMenuOpen(false)
+  }
 
   return (
-    <header className='bg-surface-elevated text-white border-b border-white/10 rounded-2xl shadow-2xl shadow-accent mt-6'>
-      <div className='flex justify-between items-center w-full max-w-6xl mx-auto px-6 md:px-8 py-4'>
-        <img src={port} alt="portfolio" className='w-10 shadow shadow-accent'/>
-        <nav className='hidden md:block'>
-          <ul className='flex gap-6 text-sm'>
-            <li>
-              <button
-                type='button'
-                onClick={() => scrollToSection('me')}
-                className='text-muted hover:text-accent transition-colors cursor-pointer bg-transparent border-none p-0'
-              >
-                Me
-              </button>
-            </li>
-            <li>
-              <button
-                type='button'
-                onClick={() => scrollToSection('projects')}
-                className='text-muted hover:text-accent transition-colors cursor-pointer bg-transparent border-none p-0'
-              >
-                Projects
-              </button>
-            </li>
-            <li>
-              <button
-                type='button'
-                onClick={() => scrollToSection('skills')}
-                className='text-muted hover:text-accent transition-colors cursor-pointer bg-transparent border-none p-0'
-              >
-                Skills
-              </button>
-            </li>
-            <li>
-              <button
-                type='button'
-                onClick={() => scrollToSection('contact')}
-                className='text-muted hover:text-accent transition-colors cursor-pointer bg-transparent border-none p-0'
-              >
-                Contact
-              </button>
-            </li>
-          </ul>
-        </nav>
+    <header className="sticky top-0 z-40 border-b border-line bg-ink/95">
+      <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-3.5 md:px-8">
         <button
-          type='button'
-          onClick={toggleMenu}
-          className='md:hidden text-muted hover:text-accent transition-colors'
-          aria-label='Toggle menu'
+          type="button"
+          onClick={() => go('me')}
+          className="cursor-pointer font-display text-base font-bold tracking-tight text-snow"
         >
-          <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-            <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d={isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'} />
+          sahil<span className="text-iris">.</span>sidhu
+        </button>
+
+        <nav className="hidden items-center gap-7 md:flex">
+          {LINKS.map((link) => (
+            <button
+              key={link.id}
+              type="button"
+              onClick={() => go(link.id)}
+              className="cursor-pointer text-sm text-fog transition-colors hover:text-snow"
+            >
+              {link.label}
+            </button>
+          ))}
+          <a
+            href="https://github.com/SahilSidhu7/Me/blob/main/SahilSidhu.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg bg-iris px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-iris-soft"
+          >
+            Resume
+          </a>
+        </nav>
+
+        <button
+          type="button"
+          onClick={() => setIsMenuOpen((open) => !open)}
+          className="text-fog transition-colors hover:text-snow md:hidden"
+          aria-label="Toggle menu"
+          aria-expanded={isMenuOpen}
+        >
+          <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d={isMenuOpen ? 'M6 18L18 6M6 6l12 12' : 'M4 6h16M4 12h16M4 18h16'}
+            />
           </svg>
         </button>
       </div>
+
       {isMenuOpen && (
-        <div className='md:hidden bg-surface-elevated border-t border-white/10'>
-          <ul className='flex flex-col gap-4 px-6 py-4 text-sm'>
+        <nav className="border-t border-line bg-ink px-6 py-4 md:hidden">
+          <ul className="flex flex-col gap-4 text-sm">
+            {LINKS.map((link) => (
+              <li key={link.id}>
+                <button
+                  type="button"
+                  onClick={() => go(link.id)}
+                  className="w-full text-left text-fog transition-colors hover:text-snow"
+                >
+                  {link.label}
+                </button>
+              </li>
+            ))}
             <li>
-              <button
-                type='button'
-                onClick={() => { scrollToSection('me'); setIsMenuOpen(false); }}
-                className='text-muted hover:text-accent transition-colors cursor-pointer bg-transparent border-none p-0 w-full text-left'
+              <a
+                href="https://github.com/SahilSidhu7/Me/blob/main/SahilSidhu.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block rounded-lg bg-iris px-4 py-2 font-semibold text-ink"
               >
-                Me
-              </button>
-            </li>
-            <li>
-              <button
-                type='button'
-                onClick={() => { scrollToSection('projects'); setIsMenuOpen(false); }}
-                className='text-muted hover:text-accent transition-colors cursor-pointer bg-transparent border-none p-0 w-full text-left'
-              >
-                Projects
-              </button>
-            </li>
-            <li>
-              <button
-                type='button'
-                onClick={() => { scrollToSection('skills'); setIsMenuOpen(false); }}
-                className='text-muted hover:text-accent transition-colors cursor-pointer bg-transparent border-none p-0 w-full text-left'
-              >
-                Skills
-              </button>
-            </li>
-            <li>
-              <button
-                type='button'
-                onClick={() => { scrollToSection('contact'); setIsMenuOpen(false); }}
-                className='text-muted hover:text-accent transition-colors cursor-pointer bg-transparent border-none p-0 w-full text-left'
-              >
-                Contact
-              </button>
+                Resume
+              </a>
             </li>
           </ul>
-        </div>
+        </nav>
       )}
     </header>
   )
 }
-
-export default Navbar

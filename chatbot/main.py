@@ -1,123 +1,82 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
-import requests
+import json
 import os
+
 from dotenv import load_dotenv
-import google.generativeai as genai
-
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
-
-from langchain_community.vectorstores import FAISS
-from langchain_ollama import OllamaEmbeddings
+from pydantic import BaseModel
 
 load_dotenv()
 
-OLLAMA_URL = os.getenv("ollama_url")
-MODEL = os.getenv("model")
-GEMINI_API_KEY = os.getenv("gemini_api_key")
+import generation  # noqa: E402
+import retrieval  # noqa: E402
 
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+STORE_DIR = os.getenv("STORE_DIR", "store")
 
 app = FastAPI()
-
 app.mount("/static", StaticFiles(directory="static"), name="static")
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # public embeddable widget
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+_store = None
+
+
+def get_store() -> retrieval.Store:
+    global _store
+    if _store is None:
+        _store = retrieval.Store.load(STORE_DIR)
+    return _store
+
+
 class ChatRequest(BaseModel):
     question: str
 
 
-# load embeddings
-embeddings = OllamaEmbeddings(model=MODEL, base_url=OLLAMA_URL)
-
-# load vector database
-db = FAISS.load_local("vectorstore", embeddings, allow_dangerous_deserialization=True)
-
-
-def get_llm_response(prompt: str) -> str:
-    """Try Gemini API first, fall back to Ollama if it fails."""
-    
-    # Try Gemini 2.0 Flash first
-    if GEMINI_API_KEY:
-        try:
-            model = genai.GenerativeModel("gemini-2.0-flash")
-            response = model.generate_content(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
-                    max_output_tokens=250,
-                    temperature=0.2,
-                    top_p=0.9,
-                )
-            )
-            if response and response.text:
-                return response.text
-        except Exception as e:
-            print(f"Gemini API error: {e}")
-    
-    # Fall back to Ollama
-    try:
-        payload = {
-            "model": MODEL,
-            "prompt": prompt,
-            "stream": False,
-            "options": {
-                "num_predict": 250,
-                "temperature": 0.2,
-                "top_p": 0.9
-            }
-        }
-        r = requests.post(f"{OLLAMA_URL}/api/generate", json=payload, timeout=30)
-        r.raise_for_status()
-        answer = r.json().get("response", "")
-        return answer
-    except Exception as e:
-        print(f"Ollama fallback error: {e}")
-        return "The assistant is currently unavailable."
+def retrieve(question: str):
+    """Hybrid search + rerank + gate. Returns (chunks, sources) or (None, []) when gated."""
+    store = get_store()
+    candidates = retrieval.search(store, question)
+    ranked = retrieval.rerank(question, candidates)
+    if not retrieval.passes_gate(ranked):
+        return None, []
+    chunks = [c for c, _ in ranked]
+    sources = list(dict.fromkeys(c["source"] for c in chunks))
+    return chunks, sources
 
 
 @app.post("/chat")
 def chat(req: ChatRequest):
+    chunks, sources = retrieve(req.question)
+    if chunks is None:
+        return {"answer": generation.REFUSAL, "sources": []}
+    try:
+        text = generation.answer(generation.build_prompt(req.question, chunks))
+    except Exception:
+        return {"answer": generation.UNAVAILABLE, "sources": []}
+    return {"answer": text, "sources": sources}
 
-    question = req.question
 
-    results = db.similarity_search_with_score(question, k=5)
+@app.post("/chat/stream")
+def chat_stream(req: ChatRequest):
+    chunks, sources = retrieve(req.question)
 
-    docs = [doc for doc, score in results if score < 1.5]
+    def sse():
+        if chunks is None:
+            yield f"data: {json.dumps({'delta': generation.REFUSAL})}\n\n"
+            yield f"data: {json.dumps({'done': True, 'sources': []})}\n\n"
+            return
+        try:
+            for delta in generation.stream_answer(generation.build_prompt(req.question, chunks)):
+                yield f"data: {json.dumps({'delta': delta})}\n\n"
+        except Exception:
+            yield f"data: {json.dumps({'delta': generation.UNAVAILABLE})}\n\n"
+        yield f"data: {json.dumps({'done': True, 'sources': sources})}\n\n"
 
-    context = "\n\n".join(
-        f"Source: {d.metadata.get('source','')}\n{d.page_content}"
-        for d in docs
-    )
-
-    prompt = f"""You are a helpful assistant for this portfolio website. Answer visitor questions using ONLY the website information provided below.
-
-Rules:
-- Answer in 2-4 sentences maximum for simple questions
-- Only use a bullet list if there are 3+ distinct items to show
-- Never use headers, bold text, or ### formatting
-- Never use filler phrases or sign-offs
-- Use "we" and "our" when referring to the team
-- If the answer is not in the website information, respond exactly: "I couldn't find that information on this website."
-
-Website information:
-{context}
-
-Visitor question: {question}
-
-Answer (be brief and direct):"""
-
-    answer = get_llm_response(prompt)
-
-    sources = list({d.metadata.get("source") for d in docs if d.metadata.get("source")})
-
-    return {"answer": answer,
-            "sources": sources}
+    return StreamingResponse(sse(), media_type="text/event-stream")

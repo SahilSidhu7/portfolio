@@ -21,6 +21,17 @@ def test_giant_paragraph_hard_split():
     assert sum(len(p) for p in parts) >= 2000  # overlap means total >= original
 
 
+def test_hard_split_does_not_cut_mid_word():
+    words = [f"word{i}" for i in range(400)]
+    text = " ".join(words)
+    parts = split_text(text, size=500, overlap=80)
+    assert any(len(p) > 500 - 120 for p in parts)  # actually exercised the hard-split path
+    original_words = set(words)
+    for p in parts:
+        for w in p.strip().split():
+            assert w in original_words, f"chunk contains a fragment not in original words: {w!r}"
+
+
 def test_make_chunks_prefixes_title_and_assigns_ids():
     pages = [{"url": "https://x.com/a", "title": "About", "text": "Some body text."}]
     chunks = make_chunks(pages)

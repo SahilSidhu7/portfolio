@@ -1,11 +1,34 @@
+def _word_boundary_cut(p: str, size: int) -> int:
+    """Index to cut p at, preferring the last space in p[:size] if one exists past size-120."""
+    window = p[:size]
+    space = window.rfind(" ")
+    if space > size - 120:
+        return space
+    return size
+
+
+def _nearest_space_start(p: str, pos: int) -> int:
+    """Snap an overlap start offset to the nearest space boundary (word start); pos unchanged if p has no spaces there."""
+    left = p.rfind(" ", 0, pos + 1)
+    right = p.find(" ", pos)
+    if left == -1 and right == -1:
+        return pos
+    if left == -1:
+        return right + 1
+    if right == -1:
+        return left + 1
+    return left + 1 if (pos - left) <= (right - pos) else right + 1
+
+
 def split_text(text: str, size: int = 500, overlap: int = 80) -> list[str]:
     """Pack paragraphs into ~size-char chunks; hard-split oversized paragraphs."""
     paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
     pieces = []
     for p in paragraphs:
         while len(p) > size:
-            pieces.append(p[:size])
-            p = p[size - overlap:]
+            cut = _word_boundary_cut(p, size)
+            pieces.append(p[:cut])
+            p = p[_nearest_space_start(p, size - overlap):]
         pieces.append(p)
 
     chunks = []
@@ -13,7 +36,8 @@ def split_text(text: str, size: int = 500, overlap: int = 80) -> list[str]:
     for piece in pieces:
         if current and len(current) + len(piece) + 2 > size:
             chunks.append(current)
-            overlap_text = current[-overlap:] if overlap else ""
+            overlap_start = _nearest_space_start(current, len(current) - overlap) if overlap else len(current)
+            overlap_text = current[overlap_start:]
             # Only use overlap if it doesn't exceed size with the piece
             if overlap_text and len(overlap_text) + len(piece) + 2 <= size:
                 current = (overlap_text + "\n\n" + piece).strip()

@@ -1,7 +1,6 @@
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-import re
 import time
 from urllib.parse import urljoin
 
@@ -20,6 +19,24 @@ load_dotenv()
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 }
+
+
+def extract_text(soup: BeautifulSoup) -> str:
+    """Join each top-level content section's text into real paragraphs, separated by blank lines."""
+    containers = soup.find_all(["section", "footer"]) or [soup.find("body") or soup]
+
+    collected = []
+    for element in containers:
+        if any(element in c.descendants for c in collected):
+            continue  # nested inside an already-collected section (e.g. section inside main)
+        collected.append(element)
+
+    paragraphs = []
+    for element in collected:
+        text = " ".join(element.get_text(separator=" ").split())
+        if text:
+            paragraphs.append(text)
+    return "\n\n".join(paragraphs)
 
 
 def scrape_website(base_url, max_pages=50):  # Increased max_pages for more coverage
@@ -78,22 +95,14 @@ def scrape_website(base_url, max_pages=50):  # Increased max_pages for more cove
                 html = driver.page_source
                 soup = BeautifulSoup(html, "html.parser")
 
-                # Remove unwanted elements
-                for element in soup(["script", "style", "nav", "footer", "aside", "header"]):
+                # Remove unwanted elements (keep footer: contact info often lives there)
+                for element in soup(["script", "style", "nav", "aside", "header"]):
                     element.decompose()
 
                 title = soup.title.string.strip() if soup.title and soup.title.string else "No Title"
 
-                # Extract all text from body
-                body = soup.find('body')
-                if body:
-                    text = body.get_text(separator='\n', strip=True)
-                else:
-                    text = soup.get_text(separator='\n', strip=True)
-
-                # Clean up text: remove excessive newlines
-                text = re.sub(r'\n+', '\n', text)
-                text = re.sub(r'\n\s*\n', '\n\n', text)
+                # Extract per-section text so paragraphs stay real (not word-soup from SPA spans)
+                text = extract_text(soup)
 
                 if text.strip():
                     documents.append({"url": url, "title": title, "text": text})

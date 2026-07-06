@@ -1,82 +1,17 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { getProjects } from '../api.js'
 
-const PROJECTS = [
-  {
-    title: 'AI Website Chatbot',
-    description:
-      'A Retrieval-Augmented Generation pipeline that scrapes any website, chunks and embeds its content into a FAISS index, and answers questions grounded in that content through a floating chat widget — embeddable with one script tag.',
-    proof: 'live on this site — bottom-right corner',
-    tech: ['Python', 'FastAPI', 'FAISS', 'Ollama', 'RAG', 'React'],
-    githubUrl: 'https://github.com/SahilSidhu7/ai-website-chatbot',
-    image: 'https://github.com/SahilSidhu7/ai-website-chatbot/blob/main/screenshots/chatthinking.png?raw=true',
-  },
-  {
-    title: 'AI Lead Generation Dashboard',
-    description:
-      'Scrapes target websites, extracts contact info, and uses a locally-run Phi-3 model to analyze each business and draft a personalized outreach email. Full pipeline served by FastAPI, visualized in a React dashboard, exportable to CSV.',
-    proof: 'full pipeline: scrape → analyze → outreach draft',
-    tech: ['Python', 'FastAPI', 'React', 'Ollama (Phi-3)'],
-    githubUrl: 'https://github.com/SahilSidhu7/AI-Lead-Generator',
-    image: 'https://github.com/SahilSidhu7/AI-Lead-Generator/blob/main/screenshots/UIDashboard.png?raw=true',
-  },
-  {
-    title: 'Job Hunt Tracker',
-    description:
-      'Searches the open web for jobs and internships via DuckDuckGo, scores every listing against my skills with whole-word matching, generates tailored cover letters, and tracks each application through the pipeline — new to offer.',
-    proof: 'built test-first · 37 passing tests',
-    tech: ['Python', 'FastAPI', 'SQLite', 'React', 'pytest'],
-    githubUrl: null,
-    status: 'In development',
-    image: null,
-  },
-  {
-    title: 'LinkedIn Showcase Generator',
-    description:
-      'Paste a GitHub repo link and it builds a LinkedIn-ready showcase post: pulls the README, detects the tech stack from manifests, collects demo media, and generates the caption — one click to copy and post.',
-    proof: 'built test-first · 24 passing tests',
-    tech: ['Python', 'FastAPI', 'GitHub API', 'React', 'pytest'],
-    githubUrl: null,
-    status: 'In development',
-    image: null,
-  },
-  {
-    title: 'AI Email Assistant',
-    description:
-      'An n8n automation workflow that watches a Gmail inbox, summarizes incoming email with a local LLM, and drafts a suggested reply — email triage without sending a byte to a cloud model.',
-    proof: 'runs unattended on a home server',
-    tech: ['n8n', 'Ollama', 'Gmail API'],
-    githubUrl: 'https://github.com/SahilSidhu7/AI-Email-Assistant-Automation',
-    image: 'https://github.com/SahilSidhu7/AI-Email-Assistant-Automation/blob/main/Screenshots/telegram.png?raw=true',
-  },
-  {
-    title: 'AI Search Assistant',
-    description:
-      'A mobile search assistant that retrieves information from multiple sources and composes contextual answers with a local LLM — search plus reasoning in one query.',
-    proof: 'mobile-first, React Native + TypeScript',
-    tech: ['React Native', 'TypeScript', 'LLM'],
-    githubUrl: 'https://github.com/SahilSidhu7/AI-Search_Assistant',
-    image: 'https://github.com/SahilSidhu7/AI-Search_Assistant/blob/main/Screenshots/image2.png?raw=true',
-  },
-  {
-    title: 'Learn Flow Coder',
-    description:
-      'A personal learning environment for structured coding practice — algorithms, patterns, and exercises tracked through a TypeScript app backed by Supabase.',
-    proof: 'daily-driver for my own practice',
-    tech: ['TypeScript', 'Supabase'],
-    githubUrl: 'https://github.com/SahilSidhu7/learn-flow-coder',
-    image: 'https://github.com/SahilSidhu7/learn-flow-coder/blob/main/screenshots/mainpage.png?raw=true',
-  },
-]
+const CATEGORIES = ['All', 'AI/ML', 'Web Dev', 'Automation']
 
 function ProjectCard({ project, index }) {
   const number = String(index + 1).padStart(2, '0')
 
   return (
     <article className="group grid overflow-hidden rounded-xl border border-line bg-panel transition-colors hover:border-iris/40 md:grid-cols-[2fr_3fr]">
-      {project.image ? (
+      {project.image_url ? (
         <div className="relative min-h-52 overflow-hidden border-b border-line md:border-b-0 md:border-r">
           <img
-            src={project.image}
+            src={project.image_url}
             alt={`${project.title} screenshot`}
             loading="lazy"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
@@ -87,7 +22,7 @@ function ProjectCard({ project, index }) {
           <div className="text-center">
             <p className="font-mono text-5xl font-semibold text-line">{number}</p>
             <p className="mt-3 inline-block rounded-md border border-signal/40 px-2.5 py-1 font-mono text-[11px] uppercase tracking-[0.15em] text-signal">
-              {project.status}
+              {project.category}
             </p>
           </div>
         </div>
@@ -98,9 +33,11 @@ function ProjectCard({ project, index }) {
           {project.title}
         </h3>
         <p className="mt-2 text-sm leading-relaxed text-fog">{project.description}</p>
-        <p className="mt-3 font-mono text-xs text-signal">→ {project.proof}</p>
+        {project.proof_line && (
+          <p className="mt-3 font-mono text-xs text-signal">&rarr; {project.proof_line}</p>
+        )}
         <div className="mt-4 flex flex-wrap gap-2">
-          {project.tech.map((tech) => (
+          {project.tech_stack.map((tech) => (
             <span
               key={tech}
               className="rounded-md border border-line bg-panel-2 px-2.5 py-1 font-mono text-xs text-fog"
@@ -109,9 +46,9 @@ function ProjectCard({ project, index }) {
             </span>
           ))}
         </div>
-        {project.githubUrl && (
+        {project.github_url && (
           <a
-            href={project.githubUrl}
+            href={project.github_url}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-5 inline-flex w-fit items-center gap-2 text-sm font-medium text-iris-soft transition-colors hover:text-snow"
@@ -132,9 +69,19 @@ function ProjectCard({ project, index }) {
 }
 
 export default function Projects() {
-  const [visibleCount, setVisibleCount] = useState(4)
-  const visibleProjects = PROJECTS.slice(0, visibleCount)
-  const hasMore = visibleCount < PROJECTS.length
+  const [projects, setProjects] = useState(null)
+  const [error, setError] = useState(false)
+  const [category, setCategory] = useState('All')
+
+  useEffect(() => {
+    getProjects()
+      .then(setProjects)
+      .catch(() => setError(true))
+  }, [])
+
+  const visible = (projects || []).filter(
+    (p) => category === 'All' || p.category === category
+  )
 
   return (
     <section id="projects" className="py-16 md:py-24">
@@ -146,25 +93,42 @@ export default function Projects() {
         Every project here covers the whole stack: data in, model or logic in the middle, working UI out.
       </p>
 
+      {projects && projects.length > 0 && (
+        <div className="mt-8 flex flex-wrap gap-2">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              onClick={() => setCategory(cat)}
+              className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                category === cat
+                  ? 'border-iris bg-iris text-ink'
+                  : 'border-line text-fog hover:border-fog hover:text-snow'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {error && (
+        <p className="mt-10 text-sm text-fog">Projects are temporarily unavailable.</p>
+      )}
+
+      {!error && !projects && <p className="mt-10 text-sm text-fog">Loading projects&hellip;</p>}
+
+      {!error && projects && visible.length === 0 && (
+        <p className="mt-10 text-sm text-fog">No projects in this category yet.</p>
+      )}
+
       <ul className="mt-10 flex flex-col gap-6">
-        {visibleProjects.map((project, index) => (
-          <li key={project.title}>
+        {visible.map((project, index) => (
+          <li key={project.id}>
             <ProjectCard project={project} index={index} />
           </li>
         ))}
       </ul>
-
-      {hasMore && (
-        <div className="mt-8 flex justify-center">
-          <button
-            type="button"
-            onClick={() => setVisibleCount(PROJECTS.length)}
-            className="rounded-lg border border-line px-5 py-2.5 text-sm font-medium text-fog transition-colors hover:border-fog hover:text-snow"
-          >
-            Show all {PROJECTS.length} projects
-          </button>
-        </div>
-      )}
     </section>
   )
 }

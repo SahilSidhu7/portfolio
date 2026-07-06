@@ -30,5 +30,17 @@ def test_session_token_rejects_missing_or_garbage():
 def test_session_token_expires(monkeypatch):
     token = auth.create_session_token(secret="test-secret")
     assert auth.verify_session_token(token, secret="test-secret", max_age=0) is False
-    time.sleep(1.1)
+    # itsdangerous truncates timestamps to whole seconds on both sides of the
+    # comparison, so sleep past 2 full seconds to clear that boundary
+    # reliably regardless of where `token`'s creation second landed.
+    time.sleep(2.1)
     assert auth.verify_session_token(token, secret="test-secret", max_age=1) is False
+
+
+def test_session_token_rejects_future_timestamp(monkeypatch):
+    # Simulate a token signed far in the future (clock skew / tampering).
+    future = time.time() + 1000
+    monkeypatch.setattr("itsdangerous.timed.time.time", lambda: future)
+    token = auth.create_session_token(secret="test-secret")
+    monkeypatch.undo()
+    assert auth.verify_session_token(token, secret="test-secret", max_age=60) is False

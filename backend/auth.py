@@ -1,5 +1,4 @@
 import os
-import time
 
 from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
 
@@ -20,16 +19,10 @@ def create_session_token(secret: str = SECRET_KEY) -> str:
 def verify_session_token(
     token: str | None, secret: str = SECRET_KEY, max_age: int = SESSION_MAX_AGE
 ) -> bool:
-    if not token:
-        return False
-    if max_age == 0:
+    if not token or max_age <= 0:
         return False
     try:
-        serializer = URLSafeTimedSerializer(secret)
-        data, timestamp_dt = serializer.loads(token, return_timestamp=True)
-        timestamp = timestamp_dt.timestamp()
-        if time.time() - timestamp > max_age:
-            return False
+        data = URLSafeTimedSerializer(secret).loads(token, max_age=max_age)
     except (BadSignature, SignatureExpired):
         return False
     return data.get("admin") is True

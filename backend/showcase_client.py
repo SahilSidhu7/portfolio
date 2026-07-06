@@ -19,13 +19,16 @@ def fetch_project(project_id: int, base_url: str | None = None, get_fn=httpx.get
 
 def map_to_portfolio_project(showcase_project: dict) -> dict:
     media = showcase_project.get("media") or []
+    first_media = media[0] if media else ""
+    if isinstance(first_media, dict):
+        first_media = first_media.get("download_url", "")
     return {
         "title": showcase_project["title"],
         "description": showcase_project["description"],
         "category": "Uncategorized",
         "tech_stack": showcase_project["tech_stack"],
         "github_url": showcase_project["github_url"],
-        "image_url": media[0] if media else "",
+        "image_url": first_media,
         "proof_line": "",
         "featured": False,
         "source": "linkedin-showcase",

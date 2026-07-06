@@ -25,7 +25,13 @@ SHOWCASE_PROJECT = {
     "tech_stack": ["Python", "FastAPI"],
     "hashtags": ["#python"],
     "caption": "Check this out!",
-    "media": ["https://example.com/screenshot.png"],
+    "media": [
+        {
+            "name": "screenshot.png",
+            "download_url": "https://example.com/screenshot.png",
+            "type": "image",
+        }
+    ],
     "created_at": "2026-01-01T00:00:00+00:00",
     "updated_at": "2026-01-01T00:00:00+00:00",
 }

@@ -107,8 +107,8 @@ def test_showcase_importable_and_import_flow(monkeypatch):
                 }
         return R()
 
-    monkeypatch.setattr(main.showcase_client, "fetch_projects", lambda **k: fake_get("x/projects").json())
-    monkeypatch.setattr(main.showcase_client, "fetch_project", lambda pid, **k: fake_get(f"x/projects/{pid}").json())
+    monkeypatch.setattr(main.showcase_client, "fetch_projects", lambda *a, **k: fake_get("x/projects").json())
+    monkeypatch.setattr(main.showcase_client, "fetch_project", lambda pid, *a, **k: fake_get(f"x/projects/{pid}").json())
 
     importable = client.get("/admin/showcase-importable").json()
     assert any(p["id"] == 42 for p in importable)
@@ -128,7 +128,7 @@ def test_showcase_importable_and_import_flow(monkeypatch):
 def test_import_returns_502_when_showcase_unreachable(monkeypatch):
     client.post("/admin/login", json={"password": "test-password-123"})
 
-    def raise_error(**k):
+    def raise_error(*a, **k):
         import httpx
         raise httpx.ConnectError("connection refused")
 

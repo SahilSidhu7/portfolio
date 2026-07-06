@@ -146,9 +146,7 @@ def import_project(showcase_id: int, request: Request):
     require_admin(request)
     try:
         showcase_project = showcase_client.fetch_project(showcase_id)
-    # ponytail: TypeError included alongside HTTPError so a broken/unreachable
-    # showcase integration always surfaces as 502, not an unhandled 500.
-    except (httpx.HTTPError, TypeError):
+    except httpx.HTTPError:
         raise HTTPException(status_code=502, detail="linkedin-showcase is unreachable.")
     mapped = showcase_client.map_to_portfolio_project(showcase_project)
     return db.create_project(mapped, get_db_path())

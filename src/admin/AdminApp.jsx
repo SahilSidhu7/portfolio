@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { whoami, logout } from '../api.js'
 import Login from './Login.jsx'
 import ProjectsTab from './ProjectsTab.jsx'
+import ProfileTab from './ProfileTab.jsx'
 
 export default function AdminApp() {
   const [checking, setChecking] = useState(true)
@@ -58,7 +59,7 @@ export default function AdminApp() {
       </header>
       <main className="mx-auto max-w-4xl px-6 py-8">
         {view === 'projects' && <ProjectsTab />}
-        {view === 'profile' && <p className="text-fog">Profile tab — added in Task 10.</p>}
+        {view === 'profile' && <ProfileTab />}
       </main>
     </div>
   )

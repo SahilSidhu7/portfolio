@@ -1,5 +1,13 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import me from '../assets/Me.png'
+import { getProfile } from '../api.js'
+
+const FALLBACK = {
+  hero_tagline: 'AI & full-stack developer',
+  hero_headline: 'Real AI systems, built end to end.',
+  hero_subtext:
+    "CS undergrad who ships RAG pipelines, local-LLM apps, and full-stack tools — running on real hardware, not just in notebooks.",
+}
 
 /* The signature element: certification scores presented the way his own
    projects present model output — as a benchmark readout. */
@@ -11,6 +19,14 @@ const EVALS = [
 ]
 
 export default function Hero() {
+  const [profile, setProfile] = useState(FALLBACK)
+
+  useEffect(() => {
+    getProfile()
+      .then(setProfile)
+      .catch(() => {})
+  }, [])
+
   return (
     <section id="me" className="flex flex-col items-start gap-12 py-16 md:flex-row md:items-center md:justify-between md:py-24">
       <div className="max-w-xl">
@@ -24,16 +40,13 @@ export default function Hero() {
         </div>
 
         <p className="rise rise-1 mt-6 font-mono text-xs font-medium uppercase tracking-[0.25em] text-signal">
-          AI &amp; full-stack developer
+          {profile.hero_tagline}
         </p>
         <h1 className="rise rise-1 mt-3 font-display text-4xl font-bold leading-[1.08] tracking-tight text-snow md:text-6xl">
-          Real AI systems,
-          <br />
-          built <span className="text-iris">end to end</span>.
+          {profile.hero_headline}
         </h1>
         <p className="rise rise-2 mt-5 text-base leading-relaxed text-fog md:text-lg">
-          CS undergrad who ships RAG pipelines, local-LLM apps, and full-stack tools —
-          running on real hardware, not just in notebooks.
+          {profile.hero_subtext}
         </p>
 
         <div className="rise rise-3 mt-8 flex flex-wrap items-center gap-3">

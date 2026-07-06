@@ -36,5 +36,5 @@ def map_to_portfolio_project(showcase_project: dict) -> dict:
 def list_importable(
     local_source_ids: set, base_url: str | None = None, get_fn=httpx.get
 ) -> list:
-    projects = fetch_projects(base_url, get_fn)
+    projects = fetch_projects(base_url=base_url, get_fn=get_fn)
     return [p for p in projects if p["id"] not in local_source_ids]

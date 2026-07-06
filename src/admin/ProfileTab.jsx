@@ -22,9 +22,13 @@ export default function ProfileTab() {
       bio_paragraphs: bioText.split('\n\n').map((p) => p.trim()).filter(Boolean),
       currently_building: buildingText.split('\n').map((l) => l.trim()).filter(Boolean),
     }
-    const saved = await saveProfile(updated)
-    setProfile(saved)
-    setMessage('Saved.')
+    try {
+      const saved = await saveProfile(updated)
+      setProfile(saved)
+      setMessage('Saved.')
+    } catch (err) {
+      setMessage(err.message)
+    }
   }
 
   if (!profile) return <p className="text-fog">Loading&hellip;</p>
@@ -62,7 +66,7 @@ export default function ProfileTab() {
       <label className="block">
         <span className="text-xs text-fog">Hero subtext</span>
         <textarea
-          value={profile.hero_subtext}
+          value={profile.hero_subtext || ''}
           onChange={(e) => setProfile({ ...profile, hero_subtext: e.target.value })}
           rows={2}
           className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-snow outline-none focus:border-iris"

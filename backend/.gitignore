@@ -1,0 +1,5 @@
+portfolio.db
+test_main.db
+.env
+__pycache__/
+*.pyc

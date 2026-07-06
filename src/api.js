@@ -1,5 +1,5 @@
 // src/api.js
-const BASE_URL = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8002'
+const BASE_URL = import.meta.env.VITE_API_BASE || 'http://localhost:8002'
 
 async function request(path, options = {}) {
   const res = await fetch(`${BASE_URL}${path}`, {

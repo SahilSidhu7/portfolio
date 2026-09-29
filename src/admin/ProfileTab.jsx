@@ -31,63 +31,63 @@ export default function ProfileTab() {
     }
   }
 
-  if (!profile) return <p className="text-fog">Loading&hellip;</p>
+  if (!profile) return <p className="text-mute">Loading&hellip;</p>
 
   const field = (label, key) => (
     <label className="block">
-      <span className="text-xs text-fog">{label}</span>
+      <span className="text-xs text-mute">{label}</span>
       <input
         type="text"
         value={profile[key] || ''}
         onChange={(e) => setProfile({ ...profile, [key]: e.target.value })}
-        className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-snow outline-none focus:border-iris"
+        className="mt-1 w-full rounded-xl border border-rule bg-white px-3 py-2 text-sm text-coal outline-none transition-shadow focus:border-peri focus:ring-2 focus:ring-peri/25"
       />
     </label>
   )
 
   const socialField = (label, key) => (
     <label className="block">
-      <span className="text-xs text-fog">{label}</span>
+      <span className="text-xs text-mute">{label}</span>
       <input
         type="text"
         value={profile.social_links[key] || ''}
         onChange={(e) =>
           setProfile({ ...profile, social_links: { ...profile.social_links, [key]: e.target.value } })
         }
-        className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-snow outline-none focus:border-iris"
+        className="mt-1 w-full rounded-xl border border-rule bg-white px-3 py-2 text-sm text-coal outline-none transition-shadow focus:border-peri focus:ring-2 focus:ring-peri/25"
       />
     </label>
   )
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-line bg-panel p-6">
+    <div className="flex flex-col gap-4 rounded-[22px] border border-rule bg-white p-6 md:p-7">
       {field('Hero tagline', 'hero_tagline')}
       {field('Hero headline', 'hero_headline')}
       <label className="block">
-        <span className="text-xs text-fog">Hero subtext</span>
+        <span className="text-xs text-mute">Hero subtext</span>
         <textarea
           value={profile.hero_subtext || ''}
           onChange={(e) => setProfile({ ...profile, hero_subtext: e.target.value })}
           rows={2}
-          className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-snow outline-none focus:border-iris"
+          className="mt-1 w-full rounded-xl border border-rule bg-white px-3 py-2 text-sm text-coal outline-none transition-shadow focus:border-peri focus:ring-2 focus:ring-peri/25"
         />
       </label>
       <label className="block">
-        <span className="text-xs text-fog">Bio paragraphs (blank line between paragraphs)</span>
+        <span className="text-xs text-mute">Bio paragraphs (blank line between paragraphs)</span>
         <textarea
           value={bioText}
           onChange={(e) => setBioText(e.target.value)}
           rows={6}
-          className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-snow outline-none focus:border-iris"
+          className="mt-1 w-full rounded-xl border border-rule bg-white px-3 py-2 text-sm text-coal outline-none transition-shadow focus:border-peri focus:ring-2 focus:ring-peri/25"
         />
       </label>
       <label className="block">
-        <span className="text-xs text-fog">Currently building (one per line)</span>
+        <span className="text-xs text-mute">Currently building (one per line)</span>
         <textarea
           value={buildingText}
           onChange={(e) => setBuildingText(e.target.value)}
           rows={4}
-          className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-snow outline-none focus:border-iris"
+          className="mt-1 w-full rounded-xl border border-rule bg-white px-3 py-2 text-sm text-coal outline-none transition-shadow focus:border-peri focus:ring-2 focus:ring-peri/25"
         />
       </label>
       {socialField('GitHub URL', 'github')}
@@ -97,11 +97,11 @@ export default function ProfileTab() {
         <button
           type="button"
           onClick={handleSave}
-          className="rounded-lg bg-iris px-5 py-2.5 text-sm font-semibold text-ink hover:bg-iris-soft"
+          className="rounded-full bg-coal px-5 py-2.5 text-sm font-semibold text-paper hover:bg-graphite"
         >
           Save profile
         </button>
-        {message && <span className="ml-3 text-sm text-fog">{message}</span>}
+        {message && <span className="ml-3 text-sm text-mute">{message}</span>}
       </div>
     </div>
   )

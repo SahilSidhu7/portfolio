@@ -37,34 +37,34 @@ function ProjectForm({ initial, onSave, onCancel }) {
 
   const field = (label, key, type = 'text') => (
     <label className="block">
-      <span className="text-xs text-fog">{label}</span>
+      <span className="text-xs text-mute">{label}</span>
       <input
         type={type}
         value={form[key]}
         onChange={(e) => set(key, e.target.value)}
-        className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-snow outline-none focus:border-iris"
+        className="mt-1 w-full rounded-xl border border-rule bg-white px-3 py-2 text-sm text-coal outline-none transition-shadow focus:border-peri focus:ring-2 focus:ring-peri/25"
       />
     </label>
   )
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-4 rounded-xl border border-line bg-panel p-6">
+    <form onSubmit={handleSubmit} className="grid gap-4 rounded-[22px] border border-rule bg-white p-6 md:p-7">
       {field('Title', 'title')}
       <label className="block">
-        <span className="text-xs text-fog">Description</span>
+        <span className="text-xs text-mute">Description</span>
         <textarea
           value={form.description}
           onChange={(e) => set('description', e.target.value)}
           rows={3}
-          className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-snow outline-none focus:border-iris"
+          className="mt-1 w-full rounded-xl border border-rule bg-white px-3 py-2 text-sm text-coal outline-none transition-shadow focus:border-peri focus:ring-2 focus:ring-peri/25"
         />
       </label>
       <label className="block">
-        <span className="text-xs text-fog">Category</span>
+        <span className="text-xs text-mute">Category</span>
         <select
           value={form.category}
           onChange={(e) => set('category', e.target.value)}
-          className="mt-1 w-full rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm text-snow outline-none focus:border-iris"
+          className="mt-1 w-full rounded-xl border border-rule bg-white px-3 py-2 text-sm text-coal outline-none transition-shadow focus:border-peri focus:ring-2 focus:ring-peri/25"
         >
           {CATEGORIES.map((c) => (
             <option key={c} value={c}>{c}</option>
@@ -75,7 +75,7 @@ function ProjectForm({ initial, onSave, onCancel }) {
       {field('GitHub URL', 'github_url')}
       {field('Image URL', 'image_url')}
       {field('Proof line', 'proof_line')}
-      <label className="flex items-center gap-2 text-sm text-snow">
+      <label className="flex items-center gap-2 text-sm text-coal">
         <input
           type="checkbox"
           checked={form.featured}
@@ -84,10 +84,10 @@ function ProjectForm({ initial, onSave, onCancel }) {
         Visible on public site
       </label>
       <div className="flex gap-3">
-        <button type="submit" className="rounded-lg bg-iris px-4 py-2 text-sm font-semibold text-ink hover:bg-iris-soft">
+        <button type="submit" className="rounded-full bg-coal px-4 py-2 text-sm font-semibold text-paper hover:bg-graphite">
           Save
         </button>
-        <button type="button" onClick={onCancel} className="rounded-lg border border-line px-4 py-2 text-sm text-fog hover:text-snow">
+        <button type="button" onClick={onCancel} className="rounded-full border border-rule bg-white px-4 py-2 text-sm text-mute hover:text-coal">
           Cancel
         </button>
       </div>
@@ -145,12 +145,12 @@ export default function ProjectsTab() {
     <div className="flex flex-col gap-8">
       <div>
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="font-display text-lg font-bold">Projects</h2>
+          <h2 className="wide text-lg font-bold">Projects</h2>
           {!adding && !editing && (
             <button
               type="button"
               onClick={() => setAdding(true)}
-              className="rounded-lg bg-iris px-4 py-2 text-sm font-semibold text-ink hover:bg-iris-soft"
+              className="rounded-full bg-coal px-4 py-2 text-sm font-semibold text-paper hover:bg-graphite"
             >
               Add project
             </button>
@@ -163,9 +163,9 @@ export default function ProjectsTab() {
         )}
 
         {!adding && !editing && (
-          <div className="overflow-hidden rounded-xl border border-line">
+          <div className="overflow-hidden rounded-[22px] border border-rule">
             <table className="w-full text-sm">
-              <thead className="bg-panel-2 text-left text-xs uppercase tracking-wide text-fog">
+              <thead className="bg-canvas text-left text-xs uppercase tracking-wide text-mute">
                 <tr>
                   <th className="px-4 py-2">Title</th>
                   <th className="px-4 py-2">Category</th>
@@ -176,23 +176,23 @@ export default function ProjectsTab() {
               </thead>
               <tbody>
                 {projects.map((p) => (
-                  <tr key={p.id} className="border-t border-line bg-panel">
-                    <td className="px-4 py-2 text-snow">{p.title}</td>
-                    <td className="px-4 py-2 text-fog">{p.category}</td>
-                    <td className="px-4 py-2 text-fog">{p.featured ? 'Yes' : 'Draft'}</td>
-                    <td className="px-4 py-2 text-fog">{p.source}</td>
+                  <tr key={p.id} className="border-t border-rule bg-white">
+                    <td className="px-4 py-2 text-coal">{p.title}</td>
+                    <td className="px-4 py-2 text-mute">{p.category}</td>
+                    <td className="px-4 py-2 text-mute">{p.featured ? 'Yes' : 'Draft'}</td>
+                    <td className="px-4 py-2 text-mute">{p.source}</td>
                     <td className="px-4 py-2">
                       <button
                         type="button"
                         onClick={() => setEditing(p)}
-                        className="mr-3 text-iris-soft hover:text-snow"
+                        className="mr-3 text-peri hover:text-coal"
                       >
                         Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete(p.id)}
-                        className="text-signal hover:text-snow"
+                        className="text-red-600 hover:text-coal"
                       >
                         Delete
                       </button>
@@ -206,22 +206,22 @@ export default function ProjectsTab() {
       </div>
 
       <div>
-        <h2 className="mb-3 font-display text-lg font-bold">Import from LinkedIn Showcase</h2>
-        {importError && <p className="text-sm text-signal">{importError}</p>}
+        <h2 className="mb-3 wide text-lg font-bold">Import from LinkedIn Showcase</h2>
+        {importError && <p className="text-sm text-red-600">{importError}</p>}
         {!importError && importable.length === 0 && (
-          <p className="text-sm text-fog">Nothing new to import.</p>
+          <p className="text-sm text-mute">Nothing new to import.</p>
         )}
         <ul className="flex flex-col gap-2">
           {importable.map((p) => (
             <li
               key={p.id}
-              className="flex items-center justify-between rounded-lg border border-line bg-panel px-4 py-3"
+              className="flex items-center justify-between rounded-2xl border border-rule bg-white px-4 py-3"
             >
-              <span className="text-sm text-snow">{p.title}</span>
+              <span className="text-sm text-coal">{p.title}</span>
               <button
                 type="button"
                 onClick={() => handleImport(p.id)}
-                className="rounded-lg border border-iris px-3 py-1.5 text-xs font-medium text-iris-soft hover:bg-iris hover:text-ink"
+                className="rounded-full border border-coal px-3 py-1.5 text-xs font-medium text-peri hover:bg-coal hover:text-paper"
               >
                 Import
               </button>

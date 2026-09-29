@@ -8,6 +8,6 @@
 (function () {
   const origin = new URL(document.currentScript.src).origin;
   const script = document.createElement("script");
-  script.src = origin + "/static/widget.js?v=2";
+  script.src = origin + "/static/widget.js?v=3";
   document.body.appendChild(script);
 })();

@@ -10,6 +10,22 @@ import requests
 OLLAMA_URL = os.getenv("OLLAMA_URL", os.getenv("ollama_url", "http://localhost:11434"))
 EMBED_MODEL = os.getenv("EMBED_MODEL", "embeddinggemma")
 
+# Without stemming, the sparse half of the search matches only exact word
+# forms. The site says "certified"; a visitor asks about "certifications";
+# bm25 scores that at zero, the lexical gate fails, and the assistant claims
+# it cannot find something that is sitting in the index. One stemmer, used for
+# both indexing and querying - they have to agree or the scores are nonsense.
+try:
+    import Stemmer
+
+    _STEMMER = Stemmer.Stemmer("english")
+except ImportError:          # still works, just less forgiving about wording
+    _STEMMER = None
+
+
+def tokenize(texts: list[str]):
+    return bm25s.tokenize(texts, stopwords="en", stemmer=_STEMMER)
+
 
 def embed_texts(texts: list[str], model: str | None = None, url: str | None = None) -> np.ndarray:
     """Embed via Ollama /api/embed; rows L2-normalized for cosine/IP search."""
@@ -46,7 +62,7 @@ def build_indexes(chunks: list[dict], store_dir: str = "store", embed=embed_text
     index.add(vecs)
     faiss.write_index(index, str(path / "index.faiss"))
 
-    tokens = bm25s.tokenize([c["text"] for c in chunks], stopwords="en")
+    tokens = tokenize([c["text"] for c in chunks])
     bm25 = bm25s.BM25()
     bm25.index(tokens)
     bm25.save(str(path / "bm25"))
@@ -76,7 +92,7 @@ def search(store: Store, question: str, k: int = 20, embed=embed_texts) -> list[
     _, dense_ids = store.index.search(qvec, k_each)
     dense_ranking = [int(i) for i in dense_ids[0] if i >= 0]
 
-    qtokens = bm25s.tokenize([question], stopwords="en")
+    qtokens = tokenize([question])
     sparse_ids, _ = store.bm25.retrieve(qtokens, k=k_each)
     sparse_ranking = [int(i) for i in sparse_ids[0]]
 
@@ -90,7 +106,7 @@ MIN_BM25_SCORE = float(os.getenv("MIN_BM25_SCORE", "1.0"))
 
 def bm25_top(store: Store, question: str) -> float:
     """Best sparse score — lexical evidence that the question is about this site."""
-    qtokens = bm25s.tokenize([question], stopwords="en")
+    qtokens = tokenize([question])
     ids, scores = store.bm25.retrieve(qtokens, k=min(1, len(store.chunks)))
     return float(scores[0][0]) if len(ids[0]) else 0.0
 

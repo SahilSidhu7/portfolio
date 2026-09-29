@@ -10,3 +10,4 @@ faiss-cpu
 numpy
 bm25s
 flashrank
+PyStemmer

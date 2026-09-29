@@ -1,75 +1,53 @@
-import React from 'react'
+import { PROFILE } from '../site.js'
 
-const PROFILE = {
-  name: 'Sahilpreet Singh Sidhu',
-  location: 'Barnala, India',
-  email: 'sahilsidhu3127@gmail.com',
-  github: 'https://github.com/SahilSidhu7',
-  linkedin: 'https://www.linkedin.com/in/sahil-sidhu-ai/',
-  resume: 'https://github.com/SahilSidhu7/Me/blob/main/SahilSidhu.pdf',
-}
+const LINKS = [
+  { label: 'GitHub', href: PROFILE.github, text: 'github.com/SahilSidhu7' },
+  { label: 'LinkedIn', href: PROFILE.linkedin, text: 'linkedin.com/in/sahil-sidhu-ai' },
+  { label: 'Resume', href: PROFILE.resume, text: 'Sahilpreet-Singh-Sidhu-Resume.pdf' },
+]
 
 export default function About() {
   return (
-    <footer id="contact" className="border-t border-line py-16 md:py-20">
-      <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
-        <div className="max-w-lg">
-          <p className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-signal">
-            Contact
-          </p>
-          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-snow md:text-4xl">
-            Hiring interns who ship?
-          </h2>
-          <p className="mt-3 text-fog">
-            I&apos;m looking for software and AI engineering internships. One email away.
-          </p>
-          <a
-            href={`mailto:${PROFILE.email}`}
-            className="mt-5 inline-block font-mono text-lg text-iris-soft underline decoration-line underline-offset-8 transition-colors hover:text-snow md:text-xl"
-          >
-            {PROFILE.email}
-          </a>
-        </div>
+    <footer id="contact" className="scroll-mt-20 pt-20 md:pt-28">
+      <div className="corner overflow-hidden rounded-[30px] bg-coal p-7 text-paper md:p-12">
+        <p className="text-sm font-semibold text-amber">Contact</p>
+        <h2 className="wide mt-3 text-5xl font-black leading-[0.92] tracking-tight md:text-8xl">
+          Let&apos;s build
+          <br />
+          something.
+        </h2>
+        <p className="mt-5 max-w-lg text-paper/70">
+          I&apos;m looking for AI and software engineering roles. One email away.
+        </p>
+        <a
+          href={`mailto:${PROFILE.email}`}
+          className="mt-8 inline-flex items-center gap-3 rounded-full bg-amber px-6 py-3.5 text-base font-semibold text-coal transition-colors hover:bg-blush md:text-lg"
+        >
+          {PROFILE.email} <span aria-hidden>→</span>
+        </a>
 
-        <ul className="flex flex-col gap-2 font-mono text-sm md:text-right">
-          <li>
-            <a
-              href={PROFILE.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-fog transition-colors hover:text-snow"
-            >
-              github.com/SahilSidhu7
-            </a>
-          </li>
-          <li>
-            <a
-              href={PROFILE.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-fog transition-colors hover:text-snow"
-            >
-              linkedin.com/in/sahil-sidhu-ai
-            </a>
-          </li>
-          <li>
-            <a
-              href={PROFILE.resume}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-fog transition-colors hover:text-snow"
-            >
-              resume.pdf ↗
-            </a>
-          </li>
+        <ul className="mt-12 grid gap-3 border-t border-white/15 pt-8 sm:grid-cols-3">
+          {LINKS.map((link) => (
+            <li key={link.label}>
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block rounded-2xl bg-white/5 p-4 transition-colors hover:bg-white/10"
+              >
+                <span className="text-xs font-semibold uppercase tracking-[0.16em] text-paper/50">{link.label}</span>
+                <span className="mt-1 block truncate text-sm text-paper group-hover:text-amber">{link.text} ↗</span>
+              </a>
+            </li>
+          ))}
         </ul>
       </div>
 
-      <div className="mt-12 flex flex-col gap-2 border-t border-line pt-6 font-mono text-xs text-fog/70 md:flex-row md:items-center md:justify-between">
+      <div className="flex flex-col gap-2 px-2 pb-2 pt-6 text-xs text-mute md:flex-row md:items-center md:justify-between">
         <span>
           © {new Date().getFullYear()} {PROFILE.name} · {PROFILE.location}
         </span>
-        <span>React + Vite + Tailwind · chatbot is my own RAG pipeline</span>
+        <span>React + Vite + Tailwind · the chat widget is my own RAG pipeline</span>
       </div>
     </footer>
   )

@@ -175,6 +175,24 @@ def init_db(db_path: str = DEFAULT_DB_PATH) -> None:
         )
         """
     )
+    conn.execute(
+        """
+        CREATE TABLE IF NOT EXISTS papers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            summary TEXT NOT NULL,
+            kind TEXT NOT NULL,
+            project TEXT NOT NULL,
+            published_on TEXT NOT NULL,
+            tags TEXT NOT NULL,
+            external_url TEXT NOT NULL,
+            file_name TEXT NOT NULL DEFAULT '',
+            featured INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL,
+            updated_at TEXT NOT NULL
+        )
+        """
+    )
     conn.commit()
 
     row = conn.execute("SELECT 1 FROM profile WHERE id = 1").fetchone()
@@ -330,3 +348,110 @@ def get_source_ids(db_path: str = DEFAULT_DB_PATH) -> set:
     ).fetchall()
     conn.close()
     return {row[0] for row in rows}
+
+
+def _row_to_paper(row: sqlite3.Row) -> dict:
+    return {
+        "id": row["id"],
+        "title": row["title"],
+        "summary": row["summary"],
+        "kind": row["kind"],
+        "project": row["project"],
+        "published_on": row["published_on"],
+        "tags": json.loads(row["tags"]),
+        "external_url": row["external_url"],
+        "file_name": row["file_name"],
+        "has_file": bool(row["file_name"]),
+        "featured": bool(row["featured"]),
+        "created_at": row["created_at"],
+        "updated_at": row["updated_at"],
+    }
+
+
+def list_papers(db_path: str = DEFAULT_DB_PATH, featured_only: bool = False) -> list:
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    query = "SELECT * FROM papers"
+    if featured_only:
+        query += " WHERE featured = 1"
+    query += " ORDER BY published_on DESC, id DESC"
+    rows = conn.execute(query).fetchall()
+    conn.close()
+    return [_row_to_paper(row) for row in rows]
+
+
+def get_paper(paper_id: int, db_path: str = DEFAULT_DB_PATH):
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    row = conn.execute("SELECT * FROM papers WHERE id = ?", (paper_id,)).fetchone()
+    conn.close()
+    return _row_to_paper(row) if row else None
+
+
+def create_paper(data: dict, db_path: str = DEFAULT_DB_PATH) -> dict:
+    now = datetime.now(timezone.utc).isoformat()
+    conn = sqlite3.connect(db_path)
+    cursor = conn.execute(
+        """
+        INSERT INTO papers
+            (title, summary, kind, project, published_on, tags, external_url,
+             file_name, featured, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """,
+        (
+            data["title"],
+            data["summary"],
+            data["kind"],
+            data["project"],
+            data["published_on"],
+            json.dumps(data["tags"]),
+            data["external_url"],
+            data.get("file_name", ""),
+            1 if data["featured"] else 0,
+            now,
+            now,
+        ),
+    )
+    conn.commit()
+    new_id = cursor.lastrowid
+    conn.close()
+    return get_paper(new_id, db_path)
+
+
+def update_paper(paper_id: int, data: dict, db_path: str = DEFAULT_DB_PATH):
+    if get_paper(paper_id, db_path) is None:
+        return None
+    now = datetime.now(timezone.utc).isoformat()
+    conn = sqlite3.connect(db_path)
+    conn.execute(
+        """
+        UPDATE papers
+        SET title = ?, summary = ?, kind = ?, project = ?, published_on = ?,
+            tags = ?, external_url = ?, featured = ?, updated_at = ?
+        WHERE id = ?
+        """,
+        (
+            data["title"],
+            data["summary"],
+            data["kind"],
+            data["project"],
+            data["published_on"],
+            json.dumps(data["tags"]),
+            data["external_url"],
+            1 if data["featured"] else 0,
+            now,
+            paper_id,
+        ),
+    )
+    conn.commit()
+    conn.close()
+    return get_paper(paper_id, db_path)
+
+
+def delete_paper(paper_id: int, db_path: str = DEFAULT_DB_PATH) -> bool:
+    conn = sqlite3.connect(db_path)
+    cursor = conn.execute("DELETE FROM papers WHERE id = ?", (paper_id,))
+    conn.commit()
+    deleted = cursor.rowcount > 0
+    conn.close()
+    return deleted

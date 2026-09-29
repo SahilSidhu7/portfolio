@@ -1,11 +1,29 @@
 @import "tailwindcss";
 
 /*
-  Theme: "ink & signal"
-  Deep violet-ink surfaces, one cool accent (iris) for actions,
-  one warm accent (signal amber) reserved for proof — scores, verdicts, readouts.
+  Public site theme: "paper bento"
+  Off-white paper card on a grey canvas, pastel tiles, heavy wide display type.
+  Each tile carries a small corner bracket (.corner) as its signature mark.
+
+  The admin panel (/admin) keeps the dark "ink" tokens below.
 */
 @theme {
+  /* public site */
+  --color-canvas: #e6e6e9;
+  --color-paper: #f6f6f4;
+  --color-coal: #0c0c0d;
+  --color-graphite: #56565b;
+  --color-mute: #6b6b72;
+  --color-rule: #dcdce0;
+  --color-peri: #8286d8;
+  --color-blush: #f1b6fb;
+  --color-mint: #a9dcd4;
+  --color-violet: #9676cb;
+  --color-amber: #ffc76b;
+
+  --font-wide: "Archivo", "Instrument Sans", system-ui, sans-serif;
+
+  /* admin panel */
   --color-ink: #0f0d14;
   --color-panel: #171321;
   --color-panel-2: #1e1930;
@@ -22,28 +40,71 @@
 }
 
 html {
-  background: var(--color-ink);
+  background: var(--color-canvas);
 }
 
 body {
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(134, 116, 244, 0.10), transparent 70%),
-    var(--color-ink);
-  color: var(--color-snow);
+  background: var(--color-canvas);
+  color: var(--color-coal);
   font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: var(--color-iris);
-  color: var(--color-ink);
+  background: var(--color-peri);
+  color: #fff;
 }
 
-/* Page-load stagger — only when motion is welcome */
+/* Heavy, extra-wide display cut of Archivo (variable wdth axis). */
+.wide {
+  font-family: var(--font-wide);
+  font-stretch: 125%;
+}
+
+/* Signature mark: a small bracket in the top-right corner of a tile. */
+.corner {
+  position: relative;
+}
+.corner::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 11px;
+  height: 11px;
+  border-top: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* Folder tab that rises from the right side of the profile card. The slanted
+   left edge is drawn with clip-path so tab and card read as one sheet. */
+.folder-tab {
+  clip-path: polygon(46px 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.dashed-link {
+  background-image: linear-gradient(to right, currentColor 50%, transparent 0);
+  background-size: 7px 1px;
+  background-repeat: repeat-x;
+  background-position: 0 100%;
+  padding-bottom: 6px;
+}
+
 @media (prefers-reduced-motion: no-preference) {
+  .spin-slow {
+    animation: spin 18s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   .rise {
     animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   }
-
   .rise-1 { animation-delay: 0.07s; }
   .rise-2 { animation-delay: 0.14s; }
   .rise-3 { animation-delay: 0.21s; }

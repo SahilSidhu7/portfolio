@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
+import SectionHead from './SectionHead.jsx'
 import certAi900 from '../assets/certificates/Cert113114552927-page-00001.jpg'
 import certDp900 from '../assets/certificates/Cert570114553972-page-00001.jpg'
 import certAz900 from '../assets/certificates/Cert958114555144-page-00001.jpg'
@@ -47,6 +48,8 @@ const SCORED = [
   },
 ]
 
+const TINTS = ['bg-amber text-coal', 'bg-peri text-white', 'bg-mint text-coal', 'bg-violet text-white']
+
 const FSO_PARTS = [
   { name: 'TypeScript', image: certTypescript },
   { name: 'GraphQL', image: certGraphql },
@@ -75,65 +78,52 @@ export default function Certificates() {
   }, [preview])
 
   return (
-    <section id="credentials" className="py-16 md:py-24">
-      <p className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-signal">
-        Credentials
-      </p>
-      <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-snow">
-        Certified, with the scores to show
-      </h2>
+    <section id="credentials" className="scroll-mt-20 pt-20 md:pt-28">
+      <SectionHead eyebrow="Credentials" title="Certified, with scores." />
 
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {SCORED.map((cert) => (
+      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {SCORED.map((cert, i) => (
           <button
             key={cert.id}
             type="button"
             onClick={() => setPreview({ title: `${cert.issuer}: ${cert.name}`, image: cert.image })}
-            className="group cursor-pointer rounded-xl border border-line bg-panel p-6 text-left transition-colors hover:border-iris/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-iris"
+            className={`corner group flex cursor-pointer flex-col rounded-[26px] p-6 text-left transition-transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-peri ${TINTS[i % TINTS.length]}`}
           >
-            <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-fog">
-              {cert.issuer}
-            </p>
-            <h3 className="mt-2 font-display text-lg font-bold leading-snug text-snow">
-              {cert.name}
-            </h3>
-            <p className="mt-4 font-mono text-3xl font-semibold text-signal">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] opacity-70">{cert.issuer}</p>
+            <h3 className="mt-2 text-lg font-semibold leading-snug">{cert.name}</h3>
+            <p className="wide mt-6 text-4xl font-extrabold leading-none">
               {cert.result}
-              <span className="text-sm text-fog">{cert.resultDetail}</span>
+              <span className="font-sans text-sm font-medium opacity-70">{cert.resultDetail}</span>
             </p>
-            <p className="mt-4 flex items-center justify-between font-mono text-xs text-fog">
+            <p className="mt-5 flex items-center justify-between text-xs font-medium opacity-80">
               <span>{cert.date}</span>
-              <span className="text-iris-soft transition-colors group-hover:text-snow">
-                View certificate →
+              <span className="underline decoration-current/40 underline-offset-4 group-hover:decoration-current">
+                View certificate
               </span>
             </p>
           </button>
         ))}
       </div>
 
-      <div className="mt-8 grid gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-line bg-panel p-6">
-          <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-fog">
-            Full Stack Open — completed parts
-          </h3>
+      <div className="mt-5 grid gap-5 md:grid-cols-2">
+        <div className="corner rounded-[26px] bg-white p-7">
+          <h3 className="text-sm font-semibold text-mute">Full Stack Open, completed parts</h3>
           <div className="mt-4 flex flex-wrap gap-2">
             {FSO_PARTS.map((part) => (
               <button
                 key={part.name}
                 type="button"
                 onClick={() => setPreview({ title: `Full Stack Open: ${part.name}`, image: part.image })}
-                className="cursor-pointer rounded-md border border-line bg-panel-2 px-3 py-1.5 font-mono text-xs text-snow transition-colors hover:border-iris/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-iris"
+                className="cursor-pointer rounded-full border border-rule px-3.5 py-1.5 text-sm font-medium text-coal transition-colors hover:bg-coal hover:text-paper focus:outline-none focus-visible:ring-2 focus-visible:ring-peri"
               >
                 {part.name} ↗
               </button>
             ))}
           </div>
         </div>
-        <div className="rounded-xl border border-line bg-panel p-6">
-          <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-fog">
-            Additional coursework
-          </h3>
-          <ul className="mt-4 space-y-1.5 text-sm text-fog">
+        <div className="corner rounded-[26px] bg-white p-7">
+          <h3 className="text-sm font-semibold text-mute">Additional coursework</h3>
+          <ul className="mt-4 space-y-1.5 text-coal">
             {COURSEWORK.map((course) => (
               <li key={course}>{course}</li>
             ))}
@@ -151,11 +141,11 @@ export default function Certificates() {
         >
           <div className="w-full max-w-3xl" onClick={(event) => event.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between">
-              <p className="font-mono text-sm text-fog">{preview.title}</p>
+              <p className="text-sm text-white/80">{preview.title}</p>
               <button
                 type="button"
                 onClick={() => setPreview(null)}
-                className="cursor-pointer text-sm text-fog transition-colors hover:text-snow"
+                className="cursor-pointer text-sm text-white/80 transition-colors hover:text-white"
               >
                 Close (Esc)
               </button>
@@ -163,7 +153,7 @@ export default function Certificates() {
             <img
               src={preview.image}
               alt={preview.title}
-              className="max-h-[80vh] w-full rounded-xl border border-line bg-panel object-contain"
+              className="max-h-[80vh] w-full rounded-2xl bg-white object-contain"
             />
           </div>
         </div>

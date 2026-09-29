@@ -2,9 +2,10 @@
 const BASE_URL = import.meta.env.VITE_API_BASE || 'https://adminport.sahilsidhu.pro'
 
 async function request(path, options = {}) {
+  const isForm = options.body instanceof FormData
   const res = await fetch(`${BASE_URL}${path}`, {
     credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
+    headers: isForm ? {} : { 'Content-Type': 'application/json' },
     ...options,
   })
   if (!res.ok) {
@@ -33,3 +34,13 @@ export const deleteProject = (id) =>
 export const getImportable = () => request('/admin/showcase-importable')
 export const importProject = (id) =>
   request(`/admin/projects/import/${id}`, { method: 'POST' })
+
+export const getPapers = () => request('/papers')
+export const paperFileUrl = (id) => `${BASE_URL}/papers/${id}/file`
+export const getAdminPapers = () => request('/admin/papers')
+export const createPaper = (formData) =>
+  request('/admin/papers', { method: 'POST', body: formData })
+export const updatePaper = (id, data) =>
+  request(`/admin/papers/${id}`, { method: 'PUT', body: JSON.stringify(data) })
+export const deletePaper = (id) =>
+  request(`/admin/papers/${id}`, { method: 'DELETE' })

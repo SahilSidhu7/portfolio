@@ -1,61 +1,37 @@
-import React, { useEffect, useState } from 'react'
-import { getProfile } from '../api.js'
-
-const FALLBACK = {
-  bio_paragraphs: [
-    "I'm a computer science student at Chitkara University (B.Tech, 2028). Instead of collecting tutorials, I build complete systems: scrape the data, build the pipeline, serve the API, design the frontend, and put it on a real server behind Cloudflare.",
-    "Most of my work runs local LLMs with Ollama — RAG pipelines over FAISS, automation workflows in n8n, and FastAPI backends with React frontends. The chatbot on this page is one of them.",
-  ],
-  currently_building: [
-    'Building Cricket AI Assistant — RAG Q&A over cricket stats',
-    'B.Tech CS @ Chitkara University · class of 2028',
-    'Open to software / AI engineering internships',
-  ],
-}
-
-export default function AboutIntro() {
-  const [profile, setProfile] = useState(FALLBACK)
-
-  useEffect(() => {
-    getProfile()
-      .then(setProfile)
-      .catch(() => {})
-  }, [])
-
+export default function AboutIntro({ profile }) {
   return (
-    <section className="py-10 md:py-14">
-      <div className="grid gap-10 rounded-xl border border-line bg-panel px-6 py-8 md:grid-cols-[3fr_2fr] md:gap-14 md:px-10 md:py-10">
-        <div>
-          <p className="font-mono text-xs font-medium uppercase tracking-[0.25em] text-signal">
-            About
+    <section className="grid gap-5 pt-16 md:grid-cols-[3fr_2fr] md:pt-24">
+      <div className="corner rounded-[26px] bg-white p-7 md:p-10">
+        <p className="text-sm font-semibold text-peri">About</p>
+        <h2 className="wide mt-3 text-3xl font-extrabold leading-[1.05] tracking-tight md:text-[2.6rem]">
+          I learn by shipping the whole thing.
+        </h2>
+        {profile.bio_paragraphs.map((paragraph, i) => (
+          <p key={i} className="mt-4 leading-relaxed text-mute">
+            {paragraph}
           </p>
-          <h2 className="mt-3 font-display text-2xl font-bold tracking-tight text-snow md:text-3xl">
-            I learn by shipping the whole thing.
-          </h2>
-          {profile.bio_paragraphs.map((paragraph, i) => (
-            <p key={i} className="mt-4 text-sm leading-relaxed text-fog md:text-base">
-              {paragraph}
-            </p>
-          ))}
-        </div>
+        ))}
+      </div>
 
-        <div className="flex flex-col gap-6 text-sm md:border-l md:border-line md:pl-10">
-          <div>
-            <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-fog">Now</h3>
-            <ul className="mt-3 space-y-2 text-snow">
-              {profile.currently_building.map((line, i) => (
-                <li key={i}>{line}</li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3 className="font-mono text-xs uppercase tracking-[0.2em] text-fog">How I work</h3>
-            <ul className="mt-3 space-y-2 text-snow">
-              <li>End to end — data, backend, frontend, deploy</li>
-              <li>Test-driven where it counts</li>
-              <li>Local-first AI: private, cheap, always on</li>
-            </ul>
-          </div>
+      <div className="grid gap-5">
+        <div className="corner rounded-[26px] bg-coal p-7 text-paper md:p-8">
+          <h3 className="text-sm font-semibold text-amber">Now</h3>
+          <ul className="mt-4 space-y-3">
+            {profile.currently_building.map((line, i) => (
+              <li key={i} className="flex gap-3 leading-snug">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-amber" aria-hidden />
+                {line}
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div className="corner rounded-[26px] bg-blush/70 p-7 md:p-8">
+          <h3 className="text-sm font-semibold text-coal/70">How I work</h3>
+          <ul className="mt-4 space-y-2 font-medium">
+            <li>End to end: data, backend, frontend, deploy</li>
+            <li>Measure it, then write down what failed</li>
+            <li>Local-first AI: private, cheap, always on</li>
+          </ul>
         </div>
       </div>
     </section>

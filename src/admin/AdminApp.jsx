@@ -3,6 +3,7 @@ import { whoami, logout } from '../api.js'
 import Login from './Login.jsx'
 import ProjectsTab from './ProjectsTab.jsx'
 import ProfileTab from './ProfileTab.jsx'
+import PapersTab from './PapersTab.jsx'
 
 export default function AdminApp() {
   const [checking, setChecking] = useState(true)
@@ -43,6 +44,13 @@ export default function AdminApp() {
           </button>
           <button
             type="button"
+            onClick={() => setView('papers')}
+            className={`rounded-lg px-4 py-2 text-sm ${view === 'papers' ? 'bg-iris text-ink' : 'text-fog hover:text-snow'}`}
+          >
+            Papers
+          </button>
+          <button
+            type="button"
             onClick={() => setView('profile')}
             className={`rounded-lg px-4 py-2 text-sm ${view === 'profile' ? 'bg-iris text-ink' : 'text-fog hover:text-snow'}`}
           >
@@ -59,6 +67,7 @@ export default function AdminApp() {
       </header>
       <main className="mx-auto max-w-4xl px-6 py-8">
         {view === 'projects' && <ProjectsTab />}
+        {view === 'papers' && <PapersTab />}
         {view === 'profile' && <ProfileTab />}
       </main>
     </div>

@@ -1,8 +1,10 @@
 import os
+import uuid
 
 import httpx
-from fastapi import FastAPI, HTTPException, Request, Response
+from fastapi import FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 import auth
@@ -150,3 +152,124 @@ def import_project(showcase_id: int, request: Request):
         raise HTTPException(status_code=502, detail="linkedin-showcase is unreachable.")
     mapped = showcase_client.map_to_portfolio_project(showcase_project)
     return db.create_project(mapped, get_db_path())
+
+
+MAX_PAPER_BYTES = 25 * 1024 * 1024
+
+
+def get_papers_dir() -> str:
+    path = os.environ.get("PAPERS_DIR", "papers_files")
+    os.makedirs(path, exist_ok=True)
+    return path
+
+
+def _public_paper(paper: dict) -> dict:
+    return {k: v for k, v in paper.items() if k != "file_name"}
+
+
+def _split_tags(raw: str) -> list:
+    return [t.strip() for t in raw.split(",") if t.strip()]
+
+
+@app.get("/papers")
+def list_public_papers():
+    return [_public_paper(p) for p in db.list_papers(get_db_path(), featured_only=True)]
+
+
+@app.get("/papers/{paper_id}/file")
+def get_paper_file(paper_id: int):
+    paper = db.get_paper(paper_id, get_db_path())
+    if paper is None or not paper["featured"] or not paper["file_name"]:
+        raise HTTPException(status_code=404, detail="Paper not found.")
+    path = os.path.join(get_papers_dir(), paper["file_name"])
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Paper not found.")
+    download_name = "".join(c if c.isalnum() or c in " -_" else "" for c in paper["title"]).strip() or "paper"
+    return FileResponse(
+        path,
+        media_type="application/pdf",
+        filename=f"{download_name}.pdf",
+        content_disposition_type="inline",
+    )
+
+
+@app.get("/admin/papers")
+def list_admin_papers(request: Request):
+    require_admin(request)
+    return db.list_papers(get_db_path(), featured_only=False)
+
+
+@app.post("/admin/papers")
+async def create_paper(
+    request: Request,
+    title: str = Form(...),
+    summary: str = Form(""),
+    kind: str = Form("Paper"),
+    project: str = Form(""),
+    published_on: str = Form(""),
+    tags: str = Form(""),
+    external_url: str = Form(""),
+    featured: bool = Form(True),
+    file: UploadFile | None = File(None),
+):
+    require_admin(request)
+    file_name = ""
+    if file is not None and file.filename:
+        content = await file.read(MAX_PAPER_BYTES + 1)
+        if len(content) > MAX_PAPER_BYTES:
+            raise HTTPException(status_code=400, detail="PDF is larger than 25 MB.")
+        if not content.startswith(b"%PDF-"):
+            raise HTTPException(status_code=400, detail="Only PDF files can be uploaded.")
+        file_name = f"{uuid.uuid4().hex}.pdf"
+        with open(os.path.join(get_papers_dir(), file_name), "wb") as f:
+            f.write(content)
+    if not file_name and not external_url.strip():
+        raise HTTPException(status_code=400, detail="Upload a PDF or give a link.")
+    return db.create_paper(
+        {
+            "title": title,
+            "summary": summary,
+            "kind": kind,
+            "project": project,
+            "published_on": published_on,
+            "tags": _split_tags(tags),
+            "external_url": external_url.strip(),
+            "file_name": file_name,
+            "featured": featured,
+        },
+        get_db_path(),
+    )
+
+
+class PaperPayload(BaseModel):
+    title: str
+    summary: str
+    kind: str
+    project: str
+    published_on: str
+    tags: list
+    external_url: str
+    featured: bool
+
+
+@app.put("/admin/papers/{paper_id}")
+def update_paper(paper_id: int, payload: PaperPayload, request: Request):
+    require_admin(request)
+    updated = db.update_paper(paper_id, payload.model_dump(), get_db_path())
+    if updated is None:
+        raise HTTPException(status_code=404, detail="Paper not found.")
+    return updated
+
+
+@app.delete("/admin/papers/{paper_id}")
+def delete_paper(paper_id: int, request: Request):
+    require_admin(request)
+    paper = db.get_paper(paper_id, get_db_path())
+    if paper is None:
+        raise HTTPException(status_code=404, detail="Paper not found.")
+    db.delete_paper(paper_id, get_db_path())
+    if paper["file_name"]:
+        path = os.path.join(get_papers_dir(), paper["file_name"])
+        if os.path.exists(path):
+            os.remove(path)
+    return {"deleted": True}

@@ -3,3 +3,6 @@ test_main.db
 .env
 __pycache__/
 *.pyc
+papers_files/
+test_papers.db
+test_papers_files/

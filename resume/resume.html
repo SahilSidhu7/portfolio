@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sahilpreet Singh Sidhu - Resume</title>
+<!--
+  Source for src/assets/Sahilpreet-Singh-Sidhu-Resume.pdf.
+  Layout: "The Builder" - skills, then projects directly under them, each project
+  as proof of a skill with its impact stated last. Regenerate with resume/build.sh.
+-->
+<style>
+  @page { size: A4; margin: 11mm 13mm; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 9.6pt/1.32 Calibri, Carlito, "Segoe UI", sans-serif; color: #111; }
+  h1 { margin: 0; font-size: 21pt; line-height: 1.1; letter-spacing: .2px; }
+  .contact { margin-top: 2px; font-size: 8.9pt; color: #333; }
+  .contact a { color: inherit; text-decoration: none; }
+  h2 { margin: 9px 0 4px; padding-bottom: 1px; border-bottom: 1px solid #111;
+       font-size: 10.4pt; letter-spacing: .8px; text-transform: uppercase; }
+  .skills p { margin: 1px 0; }
+  .group { margin: 7px 0 2px; font-size: 8.6pt; font-weight: 700; letter-spacing: .6px;
+           text-transform: uppercase; color: #444; }
+  .proj { margin-top: 4px; break-inside: avoid; }
+  .row { display: flex; justify-content: space-between; gap: 12px; }
+  .row .title b { font-size: 10pt; }
+  .row .title i { color: #333; }
+  .link { font-size: 8.6pt; color: #444; }
+  ul { margin: 1px 0 0; padding-left: 15px; }
+  li { margin: 0.5px 0; }
+  li.impact::marker { content: "\25B8  "; }
+  .impact b { font-weight: 700; }
+  .edu .row { margin-top: 1px; }
+  p { margin: 1px 0; }
+</style>
+</head>
+<body>
+
+<h1>Sahilpreet Singh Sidhu</h1>
+<div class="contact">
+  +91 98785 99063 | sahilsidhu3127@gmail.com | <a href="https://github.com/SahilSidhu7">github.com/SahilSidhu7</a> |
+  <a href="https://www.linkedin.com/in/sahil-sidhu-ai/">linkedin.com/in/sahil-sidhu-ai</a> |
+  <a href="https://sahilsidhu.pro">sahilsidhu.pro</a> | Punjab, India
+</div>
+
+<h2>Technical Skills</h2>
+<div class="skills">
+  <p><b>AI:</b> LLMs, RAG, model training and inference</p>
+  <p><b>Engineering:</b> Python, React, FastAPI, Linux, Docker</p>
+</div>
+
+<h2>Projects</h2>
+
+<div class="group">AI &middot; LLMs &middot; RAG</div>
+
+<div class="proj">
+  <div class="row"><span class="title"><b>RaceVoice: AI race commentator</b> | <i>Python, PyTorch, Hugging Face Transformers</i></span><span>2026</span></div>
+  <ul>
+    <li>Built a single sub-0.5B model that turns race telemetry into spoken commentary: words and voice from one network (a decoder predicting text and audio codes), not an LLM feeding a separate TTS.</li>
+    <li>Pruned the vocabulary from 156,802 to 9,443 tokens, cutting the model from 499M to 366M parameters and training memory about 7x; energy tokens select a shouted or calm delivery at inference.</li>
+    <li class="impact"><b>Impact:</b> voices a fully automated 24/7 YouTube racing channel, at 50 tok/s with first audio in 0.57 s, on the same 8 GB laptop that runs the game, OBS and the stream.</li>
+  </ul>
+</div>
+
+<div class="proj">
+  <div class="row"><span class="title"><b>AI Racing Drivers: ten RL personalities</b> | <i>Python, Unity ML-Agents (PPO), C#, ONNX</i></span><span>2026</span></div>
+  <ul>
+    <li>Trained ten driver personalities with PPO on live simulation from raycast and telemetry inputs, up to 120 cars in parallel: one 11M-step base policy, then per-personality reward weights for overtaking, defending, racing line and braking.</li>
+    <li>The base policy completes timed laps on all 10 circuits from a 16-car standing grid at about 223 km/h average.</li>
+    <li class="impact"><b>Impact:</b> every car on the automated YouTube racing channel is one of these models; races run AI against AI with no human input.</li>
+  </ul>
+</div>
+
+<div class="proj">
+  <div class="row"><span class="title"><b>ferry: run LLMs larger than your GPU</b> | <i>Python, PyTorch, CUDA, GGUF</i></span><span>2026</span></div>
+  <ul>
+    <li>Streams model weights from NVMe into VRAM during inference; a planner profiles the machine, reads the tensor manifest and solves the placement itself, with no hand-written offload rules.</li>
+    <li>For MoE models, pages experts per token through an LRU VRAM cache and a RAM tier, prefetching from the next layer's router (71% accurate); dense models stream layer by layer.</li>
+    <li class="impact"><b>Impact:</b> mid-range hardware runs LLMs far bigger than its VRAM: Qwen3-30B-A3B (13.7 GiB) at 3.8 tok/s and OLMoE-1B-7B at 16.5 tok/s on an 8 GB laptop GPU.</li>
+  </ul>
+</div>
+
+<div class="proj">
+  <div class="row"><span class="title"><b>2DVideoGen: smallest model for anime-style animation</b> | <i>Python, PyTorch, Transformers (T5)</i></span><span>2026</span></div>
+  <div class="link">github.com/SahilSidhu7/2DVideoGen</div>
+  <ul>
+    <li>Trained a 60M model to turn plain-English prompts into a scene-script DSL, rendered to video and scored by an automatic critic; 100% of held-out prompts parse and render, trained in under 9 minutes on CPU.</li>
+    <li>Showed that "poorly staged" scenes were a beam-search artefact, not a model defect: the same weights, sampled, lift staging from 0.19 to 0.86. Wrote it up as a paper, with all 24 attempts and their real causes logged.</li>
+    <li class="impact"><b>Impact:</b> multi-character animation from a model small enough to train on a laptop; scaling to 220M improved every metric but not the video, which ruled out capacity as the bottleneck.</li>
+  </ul>
+</div>
+
+<div class="group">Python &middot; React &middot; FastAPI &middot; Linux &middot; Docker</div>
+
+<div class="proj">
+  <div class="row"><span class="title"><b>miniVE: disposable Linux environments</b> | <i>Docker, Linux, Rust (Tauri), Svelte</i></span><span>2026</span></div>
+  <div class="link">github.com/SahilSidhu7/miniVE</div>
+  <ul>
+    <li>Desktop app that spins up isolated Python, Node or Ubuntu environments backed by Docker containers in seconds, with runtime versions fetched live from Docker Hub, multi-tab terminals and in-app port preview.</li>
+    <li class="impact"><b>Impact:</b> a throwaway Linux box for testing repos or sandboxing AI coding agents without breaking the host machine; deleting one removes the container, volume and every trace. Ships v0.5 for Windows, macOS and Linux.</li>
+  </ul>
+</div>
+
+<div class="proj">
+  <div class="row"><span class="title"><b>ServManager: server dashboard and phone remote</b> | <i>Python, FastAPI, React, WebSockets, systemd</i></span><span>2026</span></div>
+  <div class="link">github.com/SahilSidhu7/servmanager</div>
+  <ul>
+    <li>FastAPI and React app with live CPU, memory and disk over WebSocket, a browser script editor with scheduled runs and streamed output, xterm.js SSH terminals, and a PIN-locked phone remote.</li>
+    <li class="impact"><b>Impact:</b> routine server work (restarting services, running scripts, checking health) done from a phone; one port, no database, installs as a systemd service from a .deb, and runs my own home server.</li>
+  </ul>
+</div>
+
+<h2>Education</h2>
+<div class="edu">
+  <div class="row"><span><b>Chitkara University</b>, B.Tech in Computer Science</span><span>2024 to 2028 (expected)</span></div>
+  <p>CGPA: 9.27 / 10 | Coursework: Data Structures and Algorithms, Operating Systems, Computer Networks, OOP</p>
+</div>
+
+<h2>Achievements</h2>
+<p><b>Research paper:</b> "Two Routes to 2D Animation on an 8 GB Consumer GPU" (2DVideoGen write-up, arXiv submission in preparation)</p>
+<p><b>Certifications:</b> Microsoft Azure AI Fundamentals (AI-900), Azure Fundamentals (AZ-900), Azure Data Fundamentals (DP-900); Full Stack Open, University of Helsinki (7 ECTS, grade 5/5); Generative AI for Everyone, DeepLearning.AI</p>
+
+</body>
+</html>

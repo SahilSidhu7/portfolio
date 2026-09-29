@@ -9,9 +9,9 @@
   as proof of a skill with its impact stated last. Regenerate with resume/build.sh.
 -->
 <style>
-  @page { size: A4; margin: 11mm 13mm; }
+  @page { size: A4; margin: 9.5mm 12.5mm; }
   * { box-sizing: border-box; }
-  body { margin: 0; font: 9.6pt/1.32 Calibri, Carlito, "Segoe UI", sans-serif; color: #111; }
+  body { margin: 0; font: 9.45pt/1.3 Calibri, Carlito, "Segoe UI", sans-serif; color: #111; }
   h1 { margin: 0; font-size: 21pt; line-height: 1.1; letter-spacing: .2px; }
   .contact { margin-top: 2px; font-size: 8.9pt; color: #333; }
   .contact a { color: inherit; text-decoration: none; }
@@ -44,8 +44,10 @@
 
 <h2>Technical Skills</h2>
 <div class="skills">
-  <p><b>AI:</b> LLMs, RAG, model training and inference</p>
-  <p><b>Engineering:</b> Python, React, FastAPI, Linux, Docker</p>
+  <p><b>AI and ML:</b> LLMs, RAG, LLM agents (tool calling, MCP), fine-tuning (LoRA, T5), reinforcement learning (PPO, Unity ML-Agents), PyTorch, Hugging Face Transformers, embeddings, FAISS, Ollama, ONNX, quantization (GGUF), evaluation harnesses</p>
+  <p><b>Languages:</b> Python, C++, TypeScript, JavaScript, C#, SQL</p>
+  <p><b>Backend and Web:</b> FastAPI, React, REST, WebSockets, SQLite</p>
+  <p><b>Infra:</b> Linux, Docker, systemd, CUDA, Cloudflare (Pages, Tunnels)</p>
 </div>
 
 <h2>Projects</h2>
@@ -84,15 +86,15 @@
   <div class="link">github.com/SahilSidhu7/2DVideoGen</div>
   <ul>
     <li>Trained a 60M model to turn plain-English prompts into a scene-script DSL, rendered to video and scored by an automatic critic; 100% of held-out prompts parse and render, trained in under 9 minutes on CPU.</li>
-    <li>Showed that "poorly staged" scenes were a beam-search artefact, not a model defect: the same weights, sampled, lift staging from 0.19 to 0.86. Wrote it up as a paper, with all 24 attempts and their real causes logged.</li>
-    <li class="impact"><b>Impact:</b> multi-character animation from a model small enough to train on a laptop; scaling to 220M improved every metric but not the video, which ruled out capacity as the bottleneck.</li>
+    <li>Ran controlled parameter-vs-data experiments: three data revisions at a fixed 60M cut the generalisation gap from 65.7 to 15 points, while 3.7x the parameters (220M) on identical data raised every metric but not the rendered video.</li>
+    <li class="impact"><b>Impact:</b> multi-character animation from a model small enough to train on a laptop, and evidence that data design, not model size, was the bottleneck; all 24 attempts logged with their real causes.</li>
   </ul>
 </div>
 
 <div class="group">Python &middot; React &middot; FastAPI &middot; Linux &middot; Docker</div>
 
 <div class="proj">
-  <div class="row"><span class="title"><b>miniVE: disposable Linux environments</b> | <i>Docker, Linux, Rust (Tauri), Svelte</i></span><span>2026</span></div>
+  <div class="row"><span class="title"><b>miniVE: disposable Linux environments</b> | <i>Docker, Linux, Tauri, Svelte, TypeScript</i></span><span>2026</span></div>
   <div class="link">github.com/SahilSidhu7/miniVE</div>
   <ul>
     <li>Desktop app that spins up isolated Python, Node or Ubuntu environments backed by Docker containers in seconds, with runtime versions fetched live from Docker Hub, multi-tab terminals and in-app port preview.</li>
@@ -115,9 +117,8 @@
   <p>CGPA: 9.27 / 10 | Coursework: Data Structures and Algorithms, Operating Systems, Computer Networks, OOP</p>
 </div>
 
-<h2>Achievements</h2>
-<p><b>Research paper:</b> "Two Routes to 2D Animation on an 8 GB Consumer GPU" (2DVideoGen write-up, arXiv submission in preparation)</p>
-<p><b>Certifications:</b> Microsoft Azure AI Fundamentals (AI-900), Azure Fundamentals (AZ-900), Azure Data Fundamentals (DP-900); Full Stack Open, University of Helsinki (7 ECTS, grade 5/5); Generative AI for Everyone, DeepLearning.AI</p>
+<h2>Certifications</h2>
+<p>Microsoft Azure AI Fundamentals (AI-900), Azure Fundamentals (AZ-900), Azure Data Fundamentals (DP-900); Full Stack Open, University of Helsinki (7 ECTS, grade 5/5); Generative AI for Everyone, DeepLearning.AI</p>
 
 </body>
 </html>

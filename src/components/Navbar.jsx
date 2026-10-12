@@ -7,9 +7,9 @@ function Mark() {
       type="button"
       onClick={() => scrollToSection('me')}
       aria-label="Back to top"
-      className="wide flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-coal text-sm font-extrabold text-paper"
+      className="h-10 w-10 cursor-pointer transition-transform hover:-rotate-6"
     >
-      S
+      <img src="/favicon.svg" alt="Sahil Sidhu logo" className="h-10 w-10" />
     </button>
   )
 }

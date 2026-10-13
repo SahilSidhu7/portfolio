@@ -213,6 +213,16 @@ def load_api_docs() -> list[dict]:
             print(f"loaded profile ({len(text)} chars)")
 
         projects = load_all_projects()
+        # The admin list includes hidden projects, so without an explicit
+        # ranking a "top projects" question can surface old work first. This
+        # overview states the order the site itself shows.
+        featured = [p["title"] for p in projects if p.get("featured") is not False]
+        earlier = [p["title"] for p in projects if p.get("featured") is False]
+        if featured:
+            overview = "His top projects, in order: " + "; ".join(featured) + "."
+            if earlier:
+                overview += " Earlier projects, not among his top projects: " + "; ".join(earlier) + "."
+            docs.append({"url": "https://sahilsidhu.pro", "title": "Top projects", "text": overview})
         for project in projects:
             lines = [
                 f"Project: {project['title']}",
@@ -223,7 +233,7 @@ def load_api_docs() -> list[dict]:
                 project.get("proof_line", ""),
             ]
             if project.get("featured") is False:
-                lines.append("This is one of his earlier projects; it is not featured on the site right now.")
+                lines[0] = f"Earlier project (not one of his top projects): {project['title']}"
             docs.append(
                 {"url": "https://sahilsidhu.pro", "title": project["title"], "text": "\n".join(lines)}
             )

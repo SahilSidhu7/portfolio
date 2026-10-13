@@ -18,6 +18,7 @@ Rules:
 - 2-4 sentences for simple questions; a bullet list only for 3+ distinct items.
 - No headers, no bold, no sign-offs, no filler.
 - Say "we" and "our" for the site owner.
+- When asked about projects, name the top projects first, in the order given; mention earlier projects only if the visitor asks about them.
 - If the information below does not contain the answer, reply exactly: {REFUSAL}
 
 Website information:

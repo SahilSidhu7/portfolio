@@ -26,12 +26,28 @@ app.add_middleware(
 )
 
 _store = None
+_store_mtime = None
 
 
 def get_store() -> retrieval.Store:
-    global _store
-    if _store is None:
-        _store = retrieval.Store.load(STORE_DIR)
+    """Load the index, and reload it whenever a re-ingest rewrites it.
+
+    Re-indexing runs on a timer; without this the service keeps answering from
+    the copy it loaded at startup until someone restarts it. A reload that
+    fails (say, mid-write) keeps serving the previous copy.
+    """
+    global _store, _store_mtime
+    try:
+        mtime = os.path.getmtime(os.path.join(STORE_DIR, "chunks.jsonl"))
+    except OSError:
+        mtime = None
+    if _store is None or mtime != _store_mtime:
+        try:
+            _store = retrieval.Store.load(STORE_DIR)
+            _store_mtime = mtime
+        except Exception:
+            if _store is None:
+                raise
     return _store
 
 

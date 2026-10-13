@@ -8,7 +8,7 @@ from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
-from dotenv import load_dotenv
+from dotenv import dotenv_values, load_dotenv
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -142,7 +142,7 @@ def scrape_website(base_url, max_pages=50):  # Increased max_pages for more cove
 # the index, so the assistant refuses perfectly reasonable questions. These
 # files are read straight off disk to fill that gap.
 EXTRA_DOCS = [
-    ("../resume.md", "https://sahilsidhu.pro", "CV"),
+    ("../resume/resume.html", "https://sahilsidhu.pro", "CV"),
 ]
 
 
@@ -153,7 +153,13 @@ def load_local_docs() -> list[dict]:
         if not path.exists():
             print(f"skipped missing {path}")
             continue
-        text = path.read_text(encoding="utf-8").strip()
+        text = path.read_text(encoding="utf-8")
+        if path.suffix == ".html":       # the resume source is HTML; keep only its text
+            soup = BeautifulSoup(text, "html.parser")
+            for element in soup(["style", "script", "title"]):
+                element.decompose()
+            text = "\n".join(line.strip() for line in soup.get_text("\n").splitlines() if line.strip())
+        text = text.strip()
         if text:
             docs.append({"url": url, "title": title, "text": text})
             print(f"loaded {path.name} ({len(text)} chars)")
@@ -164,6 +170,26 @@ def load_local_docs() -> list[dict]:
 # Scraping the rendered page gets a compressed version of the same thing at
 # best, and often misses it entirely, so it is read from the source instead.
 PORTFOLIO_API = os.getenv("PORTFOLIO_API", "http://127.0.0.1:8002")
+
+
+def load_all_projects() -> list[dict]:
+    """Every project, including the ones hidden from the public site.
+
+    The public /projects endpoint returns featured projects only, so earlier
+    work disappears from the assistant the moment it is hidden on the site.
+    Logging in with the backend's own admin password (read from its .env on
+    this same machine) returns the full list; without it, fall back to public.
+    """
+    password = os.getenv("ADMIN_PASSWORD") or dotenv_values(
+        pathlib.Path(__file__).parent.parent / "backend" / ".env"
+    ).get("ADMIN_PASSWORD")
+    if password:
+        session = requests.Session()
+        login = session.post(f"{PORTFOLIO_API}/admin/login", json={"password": password}, timeout=10)
+        if login.ok:
+            return session.get(f"{PORTFOLIO_API}/admin/projects", timeout=10).json()
+        print(f"admin login failed ({login.status_code}); using public projects only")
+    return requests.get(f"{PORTFOLIO_API}/projects", timeout=10).json()
 
 
 def load_api_docs() -> list[dict]:
@@ -186,22 +212,36 @@ def load_api_docs() -> list[dict]:
             docs.append({"url": "https://sahilsidhu.pro", "title": "Profile", "text": text})
             print(f"loaded profile ({len(text)} chars)")
 
-        projects = requests.get(f"{PORTFOLIO_API}/projects", timeout=10).json()
+        projects = load_all_projects()
         for project in projects:
-            text = "\n".join(
-                [
-                    f"Project: {project['title']}",
-                    project.get("description", ""),
-                    f"Category: {project.get('category', '')}",
-                    f"Built with: {', '.join(project.get('tech_stack') or [])}",
-                    f"Source: {project.get('github_url', '')}",
-                    project.get("proof_line", ""),
-                ]
-            )
+            lines = [
+                f"Project: {project['title']}",
+                project.get("description", ""),
+                f"Category: {project.get('category', '')}",
+                f"Built with: {', '.join(project.get('tech_stack') or [])}",
+                f"Source: {project.get('github_url', '')}",
+                project.get("proof_line", ""),
+            ]
+            if project.get("featured") is False:
+                lines.append("This is one of his earlier projects; it is not featured on the site right now.")
             docs.append(
-                {"url": "https://sahilsidhu.pro", "title": project["title"], "text": text}
+                {"url": "https://sahilsidhu.pro", "title": project["title"], "text": "\n".join(lines)}
             )
         print(f"loaded {len(projects)} projects")
+
+        papers = requests.get(f"{PORTFOLIO_API}/papers", timeout=10).json()
+        for paper in papers:
+            text = "\n".join(
+                [
+                    f"Paper: {paper['title']}",
+                    paper.get("summary", ""),
+                    f"Type: {paper.get('kind', '')}. From the {paper.get('project', '')} project, {paper.get('published_on', '')}.",
+                    f"Topics: {', '.join(paper.get('tags') or [])}",
+                    f"Read it: {paper.get('external_url', '')}",
+                ]
+            )
+            docs.append({"url": "https://sahilsidhu.pro", "title": paper["title"], "text": text})
+        print(f"loaded {len(papers)} papers")
     except Exception as exc:            # the site is still ingestable without it
         print(f"admin API unavailable ({exc}); continuing without it")
     return docs

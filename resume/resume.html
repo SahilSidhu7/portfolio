@@ -44,7 +44,7 @@
 
 <h2>Technical Skills</h2>
 <div class="skills">
-  <p><b>AI and ML:</b> LLMs, RAG, LLM agents (tool calling, MCP), fine-tuning (LoRA, T5), reinforcement learning (PPO, Unity ML-Agents), PyTorch, Hugging Face Transformers, embeddings, FAISS, Ollama, ONNX, quantization (GGUF), evaluation harnesses</p>
+  <p><b>AI and ML:</b> LLMs, RAG, LLM agents (tool calling, MCP), fine-tuning (LoRA, T5), reinforcement learning (PPO, Unity ML-Agents), PyTorch, Hugging Face Transformers, embeddings, FAISS, Ollama, ONNX, evaluation harnesses</p>
   <p><b>Languages:</b> Python, C++, TypeScript, JavaScript, C#, SQL</p>
   <p><b>Backend and Web:</b> FastAPI, React, REST, WebSockets, SQLite</p>
   <p><b>Infra:</b> Linux, Docker, systemd, CUDA, Cloudflare (Pages, Tunnels)</p>
@@ -69,15 +69,6 @@
     <li>Trained ten driver personalities with PPO on live simulation from raycast and telemetry inputs, up to 120 cars in parallel: one 11M-step base policy, then per-personality reward weights for overtaking, defending, racing line and braking.</li>
     <li>The base policy completes timed laps on all 10 circuits from a 16-car standing grid at about 223 km/h average.</li>
     <li class="impact"><b>Impact:</b> every car on the automated YouTube racing channel is one of these models; races run AI against AI with no human input.</li>
-  </ul>
-</div>
-
-<div class="proj">
-  <div class="row"><span class="title"><b>ferry: run LLMs larger than your GPU</b> | <i>Python, PyTorch, CUDA, GGUF</i></span><span>2026</span></div>
-  <ul>
-    <li>Streams model weights from NVMe into VRAM during inference; a planner profiles the machine, reads the tensor manifest and solves the placement itself, with no hand-written offload rules.</li>
-    <li>For MoE models, pages experts per token through an LRU VRAM cache and a RAM tier, prefetching from the next layer's router (71% accurate); dense models stream layer by layer.</li>
-    <li class="impact"><b>Impact:</b> mid-range hardware runs LLMs far bigger than its VRAM: Qwen3-30B-A3B (13.7 GiB) at 3.8 tok/s and OLMoE-1B-7B at 16.5 tok/s on an 8 GB laptop GPU.</li>
   </ul>
 </div>
 

@@ -9,7 +9,7 @@ const LINKS = [
 export default function About() {
   return (
     <footer id="contact" className="scroll-mt-20 pt-20 md:pt-28">
-      <div className="corner overflow-hidden rounded-[30px] bg-coal p-7 text-paper md:p-12">
+      <div data-reveal className="corner overflow-hidden rounded-[30px] bg-coal p-7 text-paper md:p-12">
         <p className="text-sm font-semibold text-amber">Contact</p>
         <h2 className="wide mt-3 text-5xl font-black leading-[0.92] tracking-tight md:text-8xl">
           Let&apos;s build

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import AboutIntro from './components/AboutIntro'
@@ -9,6 +9,7 @@ import Papers from './components/Papers'
 import About from './components/About'
 import AdminApp from './admin/AdminApp.jsx'
 import { getPapers, getProfile, getProjects } from './api.js'
+import useReveal from './useReveal.js'
 
 const FALLBACK_PROFILE = {
   hero_tagline: 'AI software engineer',
@@ -32,6 +33,8 @@ function PublicSite() {
   const [projectsError, setProjectsError] = useState(false)
   const [papers, setPapers] = useState(null)
   const [papersError, setPapersError] = useState(false)
+  const siteRef = useRef(null)
+  useReveal(siteRef)
 
   useEffect(() => {
     getProfile()
@@ -46,7 +49,7 @@ function PublicSite() {
   }, [])
 
   return (
-    <div className="min-h-screen p-2 sm:p-4 md:p-6">
+    <div ref={siteRef} className="site min-h-screen p-2 sm:p-4 md:p-6">
       <div className="mx-auto max-w-[1280px] overflow-hidden rounded-[28px] bg-paper shadow-[0_30px_80px_-40px_rgba(0,0,0,0.35)] md:rounded-[36px]">
         <div className="md:grid md:grid-cols-[76px_1fr]">
           <Navbar />

@@ -32,8 +32,8 @@ export default function Skills() {
     <section id="skills" className="scroll-mt-20 pt-20 md:pt-28">
       <SectionHead eyebrow="Skills" title="The stack I ship with." />
       <div className="mt-10 grid gap-5 sm:grid-cols-2">
-        {SKILL_GROUPS.map((group) => (
-          <div key={group.title} className={`corner rounded-[26px] p-7 md:p-8 ${group.tint}`}>
+        {SKILL_GROUPS.map((group, i) => (
+          <div key={group.title} data-reveal style={{ '--i': i % 2 }} className={`corner rounded-[26px] p-7 md:p-8 ${group.tint}`}>
             <h3 className="wide text-lg font-bold">{group.title}</h3>
             <div className="mt-5 flex flex-wrap gap-2">
               {group.skills.map((skill) => (

@@ -34,7 +34,7 @@ function ProfileCard({ profile }) {
       </div>
 
       <div className="relative flex min-h-[520px] flex-1 flex-col justify-end overflow-hidden rounded-[26px] rounded-tr-none bg-peri p-6 text-white md:p-8">
-        <div className="absolute right-5 top-4 w-[62%] max-w-[300px] md:right-8">
+        <div className="pop absolute right-5 top-4 w-[62%] max-w-[300px] md:right-8">
           <div className="aspect-square rounded-full bg-blush p-2 ring-[7px] ring-white/95">
             <img
               src={me}
@@ -72,12 +72,13 @@ function ProfileCard({ profile }) {
   )
 }
 
-function StatTile({ value, label, className, onClick }) {
+function StatTile({ value, label, className, onClick, i }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`corner flex min-h-[130px] min-w-0 cursor-pointer flex-col justify-end rounded-[22px] p-5 text-left transition-transform hover:-translate-y-0.5 md:p-6 ${className}`}
+      style={{ '--i': i }}
+      className={`rise corner flex min-h-[130px] min-w-0 cursor-pointer flex-col justify-end rounded-[22px] p-5 text-left transition-transform hover:-translate-y-0.5 md:p-6 ${className}`}
     >
       <span className="wide text-4xl font-extrabold leading-none md:text-[2.6rem]">{value}</span>
       <span className="mt-2 text-base md:text-lg">{label}</span>
@@ -85,13 +86,14 @@ function StatTile({ value, label, className, onClick }) {
   )
 }
 
-function FeaturedTile({ projects }) {
+function FeaturedTile({ projects, i }) {
   const featured = (projects || []).find((p) => p.image_url)
   return (
     <button
       type="button"
       onClick={() => scrollToSection('projects')}
-      className="corner group relative col-span-2 min-h-[240px] cursor-pointer overflow-hidden rounded-[22px] bg-mint text-left text-white md:min-h-[300px]"
+      style={{ '--i': i }}
+      className="rise corner group relative col-span-2 min-h-[240px] cursor-pointer overflow-hidden rounded-[22px] bg-mint text-left text-white md:min-h-[300px]"
     >
       {featured ? (
         <img
@@ -129,23 +131,25 @@ export default function Hero({ profile, projects, papers }) {
           <h2 className="wide text-[3.4rem] font-black leading-[0.9] tracking-[-0.02em] sm:text-7xl xl:text-[7.2rem]">
             Portfolio
           </h2>
-          <span className="absolute right-0 top-1 h-6 w-6 border-r-[5px] border-t-[5px] border-coal md:h-8 md:w-8" aria-hidden />
+          <span className="bracket-in absolute right-0 top-1 h-6 w-6 border-r-[5px] border-t-[5px] border-coal md:h-8 md:w-8" aria-hidden />
           <p className="mt-4 max-w-xl text-base leading-relaxed text-mute">{profile.hero_subtext}</p>
         </div>
 
-        <div className="rise rise-2 grid flex-1 grid-cols-2 gap-4 sm:grid-cols-3 md:gap-5">
-          <FeaturedTile projects={projects} />
+        <div className="grid flex-1 grid-cols-2 gap-4 sm:grid-cols-3 md:gap-5">
+          <FeaturedTile projects={projects} i={2} />
           <div className="col-span-2 grid grid-cols-2 gap-4 sm:col-span-1 sm:grid-cols-1 md:gap-5">
             <StatTile
               value={projectCount}
               label="Projects"
               className="bg-mint text-coal"
+              i={3}
               onClick={() => scrollToSection('projects')}
             />
             <StatTile
               value={PROFILE.cgpa}
               label="CGPA"
               className="bg-violet text-white"
+              i={4}
               onClick={() => scrollToSection('credentials')}
             />
           </div>
@@ -154,7 +158,8 @@ export default function Hero({ profile, projects, papers }) {
             href={PROFILE.github}
             target="_blank"
             rel="noopener noreferrer"
-            className="corner col-span-2 flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[22px] bg-graphite sm:col-span-1 sm:min-h-[150px] text-white transition-transform hover:-translate-y-0.5 md:min-h-[180px]"
+            style={{ '--i': 5 }}
+            className="rise corner col-span-2 flex min-h-[120px] flex-col items-center justify-center gap-3 rounded-[22px] bg-graphite sm:col-span-1 sm:min-h-[150px] text-white transition-transform hover:-translate-y-0.5 md:min-h-[180px]"
           >
             <svg className="h-9 w-9" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
               <path
@@ -169,7 +174,8 @@ export default function Hero({ profile, projects, papers }) {
           <button
             type="button"
             onClick={() => scrollToSection(paperCount ? 'papers' : 'credentials')}
-            className="col-span-2 grid cursor-pointer grid-cols-[2fr_3fr] overflow-hidden rounded-[22px] text-left transition-transform hover:-translate-y-0.5"
+            style={{ '--i': 6 }}
+            className="rise col-span-2 grid cursor-pointer grid-cols-[2fr_3fr] overflow-hidden rounded-[22px] text-left transition-transform hover:-translate-y-0.5"
           >
             <span className="flex items-center justify-center bg-coal">
               <span

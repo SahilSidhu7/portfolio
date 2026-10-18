@@ -94,7 +94,7 @@ export default function Papers({ papers, error }) {
           </div>
         )}
       </SectionHead>
-      <p className="mt-4 max-w-2xl text-mute">
+      <p data-reveal style={{ '--i': 1 }} className="mt-4 max-w-2xl text-mute">
         Write-ups, results and the failures that came with them, including the attempts that didn&apos;t work.
       </p>
 
@@ -111,7 +111,7 @@ export default function Papers({ papers, error }) {
 
       <ul className="mt-10 grid gap-5">
         {visible.map((paper) => (
-          <li key={paper.id}>
+          <li key={paper.id} data-reveal>
             <PaperRow paper={paper} />
           </li>
         ))}

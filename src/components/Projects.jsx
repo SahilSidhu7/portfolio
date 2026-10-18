@@ -3,13 +3,34 @@ import SectionHead from './SectionHead.jsx'
 
 const CATEGORIES = ['All', 'AI/ML', 'Web Dev', 'Automation']
 const TINTS = ['bg-peri', 'bg-mint', 'bg-violet', 'bg-amber', 'bg-blush', 'bg-graphite']
+const MAX_TILT = 5 // degrees
+
+// Pointer-following tilt for mouse users. Writes CSS vars read by .tilt,
+// which only applies them when reduced motion is off.
+function tilt(event) {
+  if (event.pointerType !== 'mouse') return
+  const el = event.currentTarget
+  const rect = el.getBoundingClientRect()
+  const x = (event.clientX - rect.left) / rect.width - 0.5
+  const y = (event.clientY - rect.top) / rect.height - 0.5
+  el.style.setProperty('--ry', `${(x * MAX_TILT).toFixed(2)}deg`)
+  el.style.setProperty('--rx', `${(-y * MAX_TILT).toFixed(2)}deg`)
+}
+
+function untilt(event) {
+  event.currentTarget.style.removeProperty('--rx')
+  event.currentTarget.style.removeProperty('--ry')
+}
 
 function ProjectCard({ project, index }) {
   const number = String(index + 1).padStart(2, '0')
   const tint = TINTS[index % TINTS.length]
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-[26px] bg-white">
+    <article
+      onPointerMove={tilt}
+      onPointerLeave={untilt}
+      className="tilt group flex h-full flex-col overflow-hidden rounded-[26px] bg-white">
       <div className={`corner relative h-56 overflow-hidden ${tint} ${tint === 'bg-graphite' ? 'text-white' : 'text-coal'}`}>
         {project.image_url ? (
           <img
@@ -87,7 +108,7 @@ export default function Projects({ projects, error }) {
 
       <ul className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {visible.map((project, index) => (
-          <li key={project.id}>
+          <li key={project.id} data-reveal style={{ '--i': index % 3 }}>
             <ProjectCard project={project} index={index} />
           </li>
         ))}

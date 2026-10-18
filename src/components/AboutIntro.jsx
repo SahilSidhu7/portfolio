@@ -1,7 +1,7 @@
 export default function AboutIntro({ profile }) {
   return (
     <section className="grid gap-5 pt-16 md:grid-cols-[3fr_2fr] md:pt-24">
-      <div className="corner rounded-[26px] bg-white p-7 md:p-10">
+      <div data-reveal className="corner rounded-[26px] bg-white p-7 md:p-10">
         <p className="text-sm font-semibold text-peri">About</p>
         <h2 className="wide mt-3 text-3xl font-extrabold leading-[1.05] tracking-tight md:text-[2.6rem]">
           I learn by shipping the whole thing.
@@ -14,7 +14,7 @@ export default function AboutIntro({ profile }) {
       </div>
 
       <div className="grid gap-5">
-        <div className="corner rounded-[26px] bg-coal p-7 text-paper md:p-8">
+        <div data-reveal style={{ '--i': 1 }} className="corner rounded-[26px] bg-coal p-7 text-paper md:p-8">
           <h3 className="text-sm font-semibold text-amber">Now</h3>
           <ul className="mt-4 space-y-3">
             {profile.currently_building.map((line, i) => (
@@ -25,7 +25,7 @@ export default function AboutIntro({ profile }) {
             ))}
           </ul>
         </div>
-        <div className="corner rounded-[26px] bg-blush/70 p-7 md:p-8">
+        <div data-reveal style={{ '--i': 2 }} className="corner rounded-[26px] bg-blush/70 p-7 md:p-8">
           <h3 className="text-sm font-semibold text-coal/70">How I work</h3>
           <ul className="mt-4 space-y-2 font-medium">
             <li>End to end: data, backend, frontend, deploy</li>

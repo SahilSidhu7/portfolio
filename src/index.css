@@ -92,6 +92,19 @@ body {
   padding-bottom: 6px;
 }
 
+/* ---------- Motion (public site only: scoped to .site) ----------
+   Everything animates transform/opacity only, so layout never shifts.
+   All of it sits behind prefers-reduced-motion: no-preference. */
+:root {
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.site .corner::after {
+  transition:
+    transform 0.35s var(--ease-out),
+    opacity 0.35s var(--ease-out);
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .spin-slow {
     animation: spin 18s linear infinite;
@@ -102,13 +115,15 @@ body {
     }
   }
 
+  /* Load-in for the hero. --i staggers siblings in 70ms steps. */
   .rise {
-    animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    animation: rise 0.7s var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
   }
-  .rise-1 { animation-delay: 0.07s; }
-  .rise-2 { animation-delay: 0.14s; }
-  .rise-3 { animation-delay: 0.21s; }
-  .rise-4 { animation-delay: 0.28s; }
+  .rise-1 { --i: 1; }
+  .rise-2 { --i: 2; }
+  .rise-3 { --i: 3; }
+  .rise-4 { --i: 4; }
 
   @keyframes rise {
     from {
@@ -118,6 +133,103 @@ body {
     to {
       opacity: 1;
       transform: none;
+    }
+  }
+
+  /* Portrait settles in with a soft scale. */
+  .pop {
+    animation: pop 0.9s var(--ease-out) 0.15s both;
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.92) rotate(-4deg);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* The big hero bracket draws itself out from its corner. */
+  .bracket-in {
+    transform-origin: top right;
+    animation: bracket-in 0.6s var(--ease-out) 0.45s both;
+  }
+  @keyframes bracket-in {
+    from {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Scroll reveal (see useReveal.js). Hidden until .is-in arrives. */
+  .site [data-reveal] {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.7s var(--ease-out),
+      transform 0.7s var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 70ms);
+  }
+  .site [data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Corner bracket: tiles that enter draw their bracket in a beat later,
+     and the bracket steps out toward its corner on hover. */
+  .site .rise.corner::after,
+  .site .rise .corner::after {
+    animation: corner-in 0.5s var(--ease-out) backwards;
+    animation-delay: calc(var(--i, 0) * 70ms + 0.45s);
+  }
+  .site [data-reveal].corner::after,
+  .site [data-reveal] .corner::after {
+    opacity: 0;
+    transform: translate(-6px, 6px);
+  }
+  .site [data-reveal].is-in.corner::after,
+  .site [data-reveal].is-in .corner::after {
+    opacity: 0.55;
+    transform: none;
+    transition-delay: calc(var(--i, 0) * 70ms + 0.35s);
+  }
+  @keyframes corner-in {
+    from {
+      opacity: 0;
+      transform: translate(-6px, 6px);
+    }
+  }
+
+  @media (hover: hover) {
+    .site .corner:hover::after,
+    .site .group:hover .corner::after,
+    .site [data-reveal].is-in.corner:hover::after,
+    .site [data-reveal].is-in .group:hover .corner::after {
+      opacity: 1;
+      transform: translate(3px, -3px);
+      transition-delay: 0s;
+    }
+  }
+
+  /* Project tiles: lift on hover plus a small pointer-following tilt.
+     --rx / --ry are set from Projects.jsx on fine pointers only. */
+  .tilt {
+    transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+    transition:
+      transform 0.45s var(--ease-out),
+      box-shadow 0.45s var(--ease-out);
+    will-change: transform;
+  }
+  @media (hover: hover) {
+    .tilt:hover {
+      --lift: -6px;
+      box-shadow: 0 24px 50px -28px rgba(12, 12, 13, 0.45);
     }
   }
 }

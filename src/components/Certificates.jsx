@@ -83,30 +83,31 @@ export default function Certificates() {
 
       <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {SCORED.map((cert, i) => (
-          <button
-            key={cert.id}
-            type="button"
-            onClick={() => setPreview({ title: `${cert.issuer}: ${cert.name}`, image: cert.image })}
-            className={`corner group flex cursor-pointer flex-col rounded-[26px] p-6 text-left transition-transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-peri ${TINTS[i % TINTS.length]}`}
-          >
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] opacity-70">{cert.issuer}</p>
-            <h3 className="mt-2 text-lg font-semibold leading-snug">{cert.name}</h3>
-            <p className="wide mt-6 text-4xl font-extrabold leading-none">
-              {cert.result}
-              <span className="font-sans text-sm font-medium opacity-70">{cert.resultDetail}</span>
-            </p>
-            <p className="mt-5 flex items-center justify-between text-xs font-medium opacity-80">
-              <span>{cert.date}</span>
-              <span className="underline decoration-current/40 underline-offset-4 group-hover:decoration-current">
-                View certificate
-              </span>
-            </p>
-          </button>
+          <div key={cert.id} data-reveal style={{ '--i': i }}>
+            <button
+              type="button"
+              onClick={() => setPreview({ title: `${cert.issuer}: ${cert.name}`, image: cert.image })}
+              className={`corner group flex h-full w-full cursor-pointer flex-col rounded-[26px] p-6 text-left transition-transform hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-peri ${TINTS[i % TINTS.length]}`}
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] opacity-70">{cert.issuer}</p>
+              <h3 className="mt-2 text-lg font-semibold leading-snug">{cert.name}</h3>
+              <p className="wide mt-6 text-4xl font-extrabold leading-none">
+                {cert.result}
+                <span className="font-sans text-sm font-medium opacity-70">{cert.resultDetail}</span>
+              </p>
+              <p className="mt-5 flex items-center justify-between text-xs font-medium opacity-80">
+                <span>{cert.date}</span>
+                <span className="underline decoration-current/40 underline-offset-4 group-hover:decoration-current">
+                  View certificate
+                </span>
+              </p>
+            </button>
+          </div>
         ))}
       </div>
 
       <div className="mt-5 grid gap-5 md:grid-cols-2">
-        <div className="corner rounded-[26px] bg-white p-7">
+        <div data-reveal className="corner rounded-[26px] bg-white p-7">
           <h3 className="text-sm font-semibold text-mute">Full Stack Open, completed parts</h3>
           <div className="mt-4 flex flex-wrap gap-2">
             {FSO_PARTS.map((part) => (
@@ -121,7 +122,7 @@ export default function Certificates() {
             ))}
           </div>
         </div>
-        <div className="corner rounded-[26px] bg-white p-7">
+        <div data-reveal style={{ '--i': 1 }} className="corner rounded-[26px] bg-white p-7">
           <h3 className="text-sm font-semibold text-mute">Additional coursework</h3>
           <ul className="mt-4 space-y-1.5 text-coal">
             {COURSEWORK.map((course) => (
